@@ -1,0 +1,178 @@
+{
+  "$defs": {
+    "CropId": {
+      "enum": [
+        "corn",
+        "cotton",
+        "sorghum",
+        "soybean",
+        "wheat",
+        "peanut",
+        "oats_cover",
+        "forage_grass"
+      ],
+      "title": "CropId",
+      "type": "string"
+    },
+    "DimensionScores": {
+      "properties": {
+        "climate": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Climate",
+          "type": "number"
+        },
+        "soil": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Soil",
+          "type": "number"
+        },
+        "market": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Market",
+          "type": "number"
+        },
+        "total": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Total",
+          "type": "number"
+        }
+      },
+      "required": [
+        "climate",
+        "soil",
+        "market",
+        "total"
+      ],
+      "title": "DimensionScores",
+      "type": "object"
+    },
+    "Priority": {
+      "enum": [
+        "Profit",
+        "Water Saving",
+        "Soil Health",
+        "Balanced"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "RotationResult": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "sequence": {
+          "items": {
+            "$ref": "#/$defs/CropId"
+          },
+          "title": "Sequence",
+          "type": "array"
+        },
+        "is_current": {
+          "title": "Is Current",
+          "type": "boolean"
+        },
+        "scores": {
+          "$ref": "#/$defs/DimensionScores"
+        },
+        "why": {
+          "title": "Why",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "benefits": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Benefits",
+          "type": "array"
+        },
+        "gaps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Gaps",
+          "type": "array"
+        },
+        "risks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "sequence",
+        "is_current",
+        "scores",
+        "why",
+        "evidence",
+        "benefits",
+        "gaps",
+        "risks"
+      ],
+      "title": "RotationResult",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "farm_id": {
+      "title": "Farm Id",
+      "type": "string"
+    },
+    "priority": {
+      "$ref": "#/$defs/Priority"
+    },
+    "best_rotation_id": {
+      "title": "Best Rotation Id",
+      "type": "string"
+    },
+    "rotations": {
+      "items": {
+        "$ref": "#/$defs/RotationResult"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "title": "Rotations",
+      "type": "array"
+    },
+    "data_notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Data Notes",
+      "type": "array"
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "type": "string"
+    }
+  },
+  "required": [
+    "farm_id",
+    "priority",
+    "best_rotation_id",
+    "rotations",
+    "disclaimer"
+  ],
+  "title": "RecommendResponse",
+  "type": "object"
+}
