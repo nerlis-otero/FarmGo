@@ -1,0 +1,154 @@
+{
+  "$defs": {
+    "CropHistoryItem": {
+      "properties": {
+        "year": {
+          "title": "Year",
+          "type": "integer"
+        },
+        "crop_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CropId"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "cdl_name": {
+          "title": "Cdl Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "year",
+        "cdl_name"
+      ],
+      "title": "CropHistoryItem",
+      "type": "object"
+    },
+    "CropId": {
+      "enum": [
+        "corn",
+        "cotton",
+        "sorghum",
+        "soybean",
+        "wheat",
+        "peanut",
+        "oats_cover",
+        "forage_grass"
+      ],
+      "title": "CropId",
+      "type": "string"
+    },
+    "SoilMetrics": {
+      "description": "Fuente: SSURGO (Soil Data Access).",
+      "properties": {
+        "texture": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Texture"
+        },
+        "drainage_class": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Drainage Class"
+        },
+        "organic_matter_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organic Matter Pct"
+        },
+        "slope_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Slope Pct"
+        },
+        "erodibility_k": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Erodibility K"
+        }
+      },
+      "title": "SoilMetrics",
+      "type": "object"
+    }
+  },
+  "description": "Módulo del integrante 3. Fuentes: SSURGO + CropScape.",
+  "properties": {
+    "soil": {
+      "$ref": "#/$defs/SoilMetrics"
+    },
+    "crop_history": {
+      "items": {
+        "$ref": "#/$defs/CropHistoryItem"
+      },
+      "title": "Crop History",
+      "type": "array"
+    },
+    "current_rotation": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/CropId"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Current Rotation"
+    },
+    "gaps": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Gaps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "soil"
+  ],
+  "title": "SoilRotationMetrics",
+  "type": "object"
+}

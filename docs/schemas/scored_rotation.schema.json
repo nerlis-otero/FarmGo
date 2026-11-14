@@ -1,0 +1,103 @@
+{
+  "$defs": {
+    "CropId": {
+      "enum": [
+        "corn",
+        "cotton",
+        "sorghum",
+        "soybean",
+        "wheat",
+        "peanut",
+        "oats_cover",
+        "forage_grass"
+      ],
+      "title": "CropId",
+      "type": "string"
+    },
+    "DimensionScores": {
+      "properties": {
+        "climate": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Climate",
+          "type": "number"
+        },
+        "soil": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Soil",
+          "type": "number"
+        },
+        "market": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Market",
+          "type": "number"
+        },
+        "total": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Total",
+          "type": "number"
+        }
+      },
+      "required": [
+        "climate",
+        "soil",
+        "market",
+        "total"
+      ],
+      "title": "DimensionScores",
+      "type": "object"
+    }
+  },
+  "description": "Salida del motor de puntuación. El modelo de lenguaje NO calcula esto.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "label": {
+      "title": "Label",
+      "type": "string"
+    },
+    "sequence": {
+      "items": {
+        "$ref": "#/$defs/CropId"
+      },
+      "minItems": 1,
+      "title": "Sequence",
+      "type": "array"
+    },
+    "is_current": {
+      "title": "Is Current",
+      "type": "boolean"
+    },
+    "scores": {
+      "$ref": "#/$defs/DimensionScores"
+    },
+    "rules_applied": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Rules Applied",
+      "type": "array"
+    },
+    "facts": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Facts",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "label",
+    "sequence",
+    "is_current",
+    "scores"
+  ],
+  "title": "ScoredRotation",
+  "type": "object"
+}

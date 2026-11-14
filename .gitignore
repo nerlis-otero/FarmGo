@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Node / Next.js
+node_modules/
+.next/
+
+# Claves y entornos (nunca subir)
+.env
+.env.*
+
+# Sistema
+.DS_Store
+
+!.env.example
+backend/.cache/
