@@ -1,0 +1,114 @@
+{
+  "$defs": {
+    "CropId": {
+      "enum": [
+        "corn",
+        "cotton",
+        "sorghum",
+        "soybean",
+        "wheat",
+        "peanut",
+        "oats_cover",
+        "forage_grass"
+      ],
+      "title": "CropId",
+      "type": "string"
+    },
+    "CropMarket": {
+      "properties": {
+        "price": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Price"
+        },
+        "price_unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Price Unit"
+        },
+        "typical_yield": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Typical Yield"
+        },
+        "yield_unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Yield Unit"
+        },
+        "price_trend": {
+          "anyOf": [
+            {
+              "enum": [
+                "up",
+                "flat",
+                "down"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Price Trend"
+        }
+      },
+      "title": "CropMarket",
+      "type": "object"
+    }
+  },
+  "description": "Módulo del integrante 4. Fuente: USDA NASS QuickStats.",
+  "properties": {
+    "crops": {
+      "additionalProperties": {
+        "$ref": "#/$defs/CropMarket"
+      },
+      "propertyNames": {
+        "$ref": "#/$defs/CropId"
+      },
+      "title": "Crops",
+      "type": "object"
+    },
+    "gaps": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Gaps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "crops"
+  ],
+  "title": "MarketMetrics",
+  "type": "object"
+}

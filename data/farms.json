@@ -1,0 +1,8 @@
+{
+  "_nota": "PROPUESTA: 3 regiones contrastantes de Texas. Ajustar en la reunión de arranque.",
+  "farms": [
+    { "farm_id": "farm_1", "name": "High Plains (Lubbock)",       "lat": 33.5779, "lon": -101.8552, "county_fips": "48303" },
+    { "farm_id": "farm_2", "name": "Blackland Prairie (Waco)",    "lat": 31.5493, "lon": -97.1467,  "county_fips": "48309" },
+    { "farm_id": "farm_3", "name": "Rio Grande Valley (Hidalgo)", "lat": 26.2034, "lon": -98.2300,  "county_fips": "48215" }
+  ]
+}

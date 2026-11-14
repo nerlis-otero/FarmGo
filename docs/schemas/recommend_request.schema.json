@@ -1,0 +1,61 @@
+{
+  "$defs": {
+    "Priority": {
+      "enum": [
+        "Profit",
+        "Water Saving",
+        "Soil Health",
+        "Balanced"
+      ],
+      "title": "Priority",
+      "type": "string"
+    }
+  },
+  "description": "POST /recommend. Se envía farm_id O (lat y lon).",
+  "properties": {
+    "farm_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Farm Id"
+    },
+    "lat": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Lat"
+    },
+    "lon": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Lon"
+    },
+    "priority": {
+      "$ref": "#/$defs/Priority"
+    }
+  },
+  "required": [
+    "priority"
+  ],
+  "title": "RecommendRequest",
+  "type": "object"
+}

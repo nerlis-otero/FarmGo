@@ -1,0 +1,69 @@
+{
+  "$defs": {
+    "LLMRotationExplanation": {
+      "description": "Lo único que devuelve el modelo de lenguaje, por rotación.",
+      "properties": {
+        "rotation_id": {
+          "title": "Rotation Id",
+          "type": "string"
+        },
+        "why": {
+          "title": "Why",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "benefits": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Benefits",
+          "type": "array"
+        },
+        "gaps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Gaps",
+          "type": "array"
+        },
+        "risks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "rotation_id",
+        "why",
+        "evidence",
+        "benefits",
+        "gaps",
+        "risks"
+      ],
+      "title": "LLMRotationExplanation",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "explanations": {
+      "items": {
+        "$ref": "#/$defs/LLMRotationExplanation"
+      },
+      "title": "Explanations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "explanations"
+  ],
+  "title": "LLMOutput",
+  "type": "object"
+}
