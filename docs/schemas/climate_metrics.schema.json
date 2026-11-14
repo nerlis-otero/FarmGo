@@ -1,0 +1,112 @@
+{
+  "description": "Módulo del integrante 2. Fuentes: NASA POWER + NDVI de MODIS.",
+  "properties": {
+    "county_fips": {
+      "title": "County Fips",
+      "type": "string"
+    },
+    "period_start_year": {
+      "title": "Period Start Year",
+      "type": "integer"
+    },
+    "period_end_year": {
+      "title": "Period End Year",
+      "type": "integer"
+    },
+    "seasonal_rain_mm": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "propertyNames": {
+        "enum": [
+          "winter",
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "title": "Seasonal Rain Mm",
+      "type": "object"
+    },
+    "mean_temp_c_by_month": {
+      "items": {
+        "type": "number"
+      },
+      "maxItems": 12,
+      "minItems": 12,
+      "title": "Mean Temp C By Month",
+      "type": "array"
+    },
+    "dry_months": {
+      "maximum": 12,
+      "minimum": 0,
+      "title": "Dry Months",
+      "type": "integer"
+    },
+    "soil_moisture_modeled_by_month": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 12,
+          "minItems": 12,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Soil Moisture Modeled By Month"
+    },
+    "ndvi_monthly": {
+      "anyOf": [
+        {
+          "items": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxItems": 12,
+          "minItems": 12,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ndvi Monthly"
+    },
+    "bare_field_months": {
+      "items": {
+        "type": "integer"
+      },
+      "title": "Bare Field Months",
+      "type": "array"
+    },
+    "gaps": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Gaps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "county_fips",
+    "period_start_year",
+    "period_end_year",
+    "seasonal_rain_mm",
+    "mean_temp_c_by_month",
+    "dry_months"
+  ],
+  "title": "ClimateMetrics",
+  "type": "object"
+}
