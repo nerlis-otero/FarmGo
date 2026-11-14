@@ -1,0 +1,33 @@
+// Decorative background: soft sky and green hills with crop rows in perspective.
+export default function FieldBackground() {
+  const rows = Array.from({ length: 25 }, (_, i) => i - 12);
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-[#dcefef] to-[#f4f9f8]"
+    >
+      <svg
+        viewBox="0 0 1440 320"
+        preserveAspectRatio="xMidYMax slice"
+        className="absolute bottom-0 h-48 w-full md:h-72"
+      >
+        <defs>
+          <clipPath id="front-field">
+            <path d="M0 215 Q360 170 720 195 T1440 180 V320 H0 Z" />
+          </clipPath>
+        </defs>
+
+        <path d="M0 150 Q300 90 620 140 T1440 110 V320 H0 Z" fill="#5bb075" fillOpacity="0.18" />
+        <path d="M0 185 Q400 130 760 170 T1440 150 V320 H0 Z" fill="#439f63" fillOpacity="0.25" />
+        <path d="M0 215 Q360 170 720 195 T1440 180 V320 H0 Z" fill="#00824c" fillOpacity="0.3" />
+
+        <g clipPath="url(#front-field)" stroke="#ffffff" strokeOpacity="0.45" strokeWidth="3">
+          {rows.map((i) => (
+            <line key={i} x1={720 + i * 170} y1={320} x2={720 + i * 6} y2={170} />
+          ))}
+        </g>
+      </svg>
+    </div>
+  );
+}
