@@ -31,24 +31,23 @@ export default function BluebyStage({ text, children }: Props) {
   const { shown, done } = useTypewriter(text);
 
   return (
-    <section className="flex flex-col items-start gap-6 md:flex-row md:gap-8">
-      <div className="md:sticky md:top-6">
-        <Blueby talking={!done} />
-      </div>
-
-      <div className="flex min-w-0 flex-1 flex-col gap-6">
-        <div className="bubble rounded-xl border-2 border-navy bg-white p-5">
+    <section className="flex flex-col gap-4">
+      <div className="flex items-start gap-3 sm:gap-4">
+        <div className="shrink-0 pt-1">
+          <Blueby talking={!done} />
+        </div>
+        <div className="bubble min-w-0 flex-1 rounded-xl border-2 border-navy/80 bg-white/95 p-3 shadow-sm sm:p-4">
           {/* Screen readers receive the full text at once. */}
           <p className="sr-only" role="status">
             Blueby says: {text}
           </p>
-          <p aria-hidden="true" className="relative text-xl font-semibold leading-snug">
+          <p aria-hidden="true" className="relative text-base font-semibold leading-snug sm:text-lg">
             <span className="invisible">{text}</span>
             <span className="absolute inset-0">{shown}</span>
           </p>
         </div>
-        {children}
       </div>
+      {children}
     </section>
   );
 }

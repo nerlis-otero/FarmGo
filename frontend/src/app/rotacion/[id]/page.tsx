@@ -5,80 +5,98 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import BluebyStage from "@/components/BluebyStage";
 import Indicators from "@/components/Indicators";
-import NdviChart from "@/components/NdviChart";
-import { priorityLabel, rotationName } from "@/data/labels";
-import { getMockRecommendation } from "@/data/mock";
-import type { Priority } from "@/types/recommendation";
+import { getDemoRecommendation } from "@/data/demo";
+import { parsePriority, priorityLabel, rotationName } from "@/data/labels";
 
 function Detail() {
   const { id } = useParams<{ id: string }>();
   const params = useSearchParams();
   const farm = params.get("farm") ?? "farm_1";
-  const priority = (params.get("priority") ?? "balanced") as Priority;
-  const keep = new URLSearchParams({ farm, priority });
-  const lat = params.get("lat");
-  const lon = params.get("lon");
-  if (lat && lon) {
-    keep.set("lat", lat);
-    keep.set("lon", lon);
-  }
-  const backHref = `/comparar?${keep.toString()}`;
-
-  const rec = getMockRecommendation(farm, priority);
-  const rotation = rec.rotations.find((r) => r.id === id);
+  const priority = parsePriority(params.get("priority"));
+  const recommendation = getDemoRecommendation(farm, priority);
+  const query = new URLSearchParams({ farm, priority }).toString();
+  const backHref = `/comparar?${query}`;
+  const rotation = recommendation.rotations.find((result) => result.id === id);
 
   if (!rotation) {
     return (
-      <div className="flex flex-col gap-3">
-        <p>We couldn’t find that option.</p>
-        <Link href={backHref} className="font-bold text-indigo underline">
-          Back to my 3 options
+      <section className="rounded-2xl bg-white/95 p-6 shadow-soft">
+        <h1 className="text-2xl font-bold">We couldn’t find that sample plan.</h1>
+        <Link href={backHref} className="mt-4 inline-block font-bold text-indigo underline">
+          Back to sample plans
         </Link>
-      </div>
+      </section>
     );
   }
 
+  const sections = [
+    { title: "Benefits", items: rotation.benefits },
+    { title: "Example evidence", items: rotation.evidence },
+    { title: "Things to check", items: rotation.gaps },
+    { title: "Possible trade-offs", items: rotation.risks },
+  ].filter((section) => section.items.length > 0);
+
   return (
-    <div className="flex flex-col gap-10">
-      <div>
-        <Link href={backHref} className="font-bold text-indigo underline">
-          Back to my 3 options
-        </Link>
+    <div className="flex flex-col gap-7">
+      <Link href={backHref} className="w-fit font-bold text-indigo underline underline-offset-4">
+        ← Back to sample plans
+      </Link>
+
+      <div className="rounded-xl border border-straw/80 bg-white/90 px-4 py-3 shadow-sm">
+        <p className="font-bold text-navy">Demo preview — illustrative results only</p>
+        <p className="text-base text-navy/70">
+          This example is not based on live farm data or a real agronomic assessment.
+        </p>
       </div>
 
-      <BluebyStage text={`Here’s why: ${rotation.reasons.join(" ")}`} />
+      <BluebyStage text={rotation.why} />
 
-      <section className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">{rotationName(rotation.crops)}</h1>
+      <section className="flex flex-col gap-3">
+        <div className="flex flex-wrap gap-2">
+          {rotation.id === recommendation.best_rotation_id && (
+            <span className="rounded-full bg-fern px-3 py-1 text-sm font-bold text-white">
+              Top example for your goal
+            </span>
+          )}
+          {rotation.is_current && (
+            <span className="rounded-full bg-mist px-3 py-1 text-sm font-bold">
+              Example current rotation
+            </span>
+          )}
+        </div>
+        <h1 className="text-3xl font-bold sm:text-4xl">{rotationName(rotation.sequence)}</h1>
         <p>
-          Based on your priority: <strong>{priorityLabel(priority)}</strong>.
+          Sample plan for: <strong>{priorityLabel(priority)}</strong>
         </p>
-        {rec.isMock && (
-          <p className="mt-1 w-fit rounded-md bg-straw px-3 py-1 font-bold">Sample data</p>
-        )}
       </section>
 
-      <section className="max-w-md rounded-xl border border-navy/20 bg-white p-5">
-        <h2 className="mb-3 text-2xl font-bold">How it performs</h2>
+      <section className="max-w-xl rounded-2xl border border-navy/10 bg-white/95 p-5 shadow-soft">
+        <h2 className="mb-4 text-2xl font-bold">How this sample scores</h2>
         <Indicators scores={rotation.scores} />
-      </section>
-
-      <section className="rounded-xl border border-navy/20 bg-white p-5">
-        <h2 className="text-2xl font-bold">Your crop’s growth throughout the year</h2>
-        <p className="mb-4 mt-1 text-navy/80">
-          Months with bare fields: {rotation.bareFieldMonths}. Months with crop stress:{" "}
-          {rotation.stressMonths}.
+        <p className="mt-4 border-t border-navy/10 pt-3 font-bold">
+          Overall example score: {rotation.scores.total} out of 100
         </p>
-        <NdviChart data={rotation.ndvi} />
       </section>
 
-      <section className="rounded-xl bg-mist p-5">
-        <h2 className="text-2xl font-bold">Before you decide</h2>
-        <p className="mt-1">Confirm these details with a local expert. Keep in mind:</p>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
-          {[...rotation.gaps, ...rec.gaps].map((g) => (
-            <li key={g}>{g}</li>
-          ))}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {sections.map((section) => (
+          <section
+            key={section.title}
+            className="rounded-2xl border border-navy/10 bg-white/95 p-5 shadow-sm"
+          >
+            <h2 className="text-xl font-bold">{section.title}</h2>
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-navy/80">
+              {section.items.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </section>
+        ))}
+      </div>
+
+      <section className="rounded-2xl bg-mist/90 p-5">
+        <h2 className="text-xl font-bold">Please remember</h2>
+        <p className="mt-2 text-base">{recommendation.disclaimer}</p>
+        <ul className="mt-3 list-disc space-y-1 pl-5 text-base text-navy/80">
+          {recommendation.data_notes.map((note) => <li key={note}>{note}</li>)}
         </ul>
       </section>
     </div>
@@ -87,7 +105,7 @@ function Detail() {
 
 export default function RotationDetailPage() {
   return (
-    <Suspense fallback={<p>Loading…</p>}>
+    <Suspense fallback={<p role="status">Loading sample plan…</p>}>
       <Detail />
     </Suspense>
   );

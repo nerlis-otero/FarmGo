@@ -51,8 +51,8 @@ export default function FarmMap({ position, onSelect }: Props) {
     <MapContainer
       center={[31.5, -99.5]}
       zoom={6}
-      className="h-72 w-full rounded-xl border-2 border-navy md:h-96"
-      aria-label="Map of Texas for marking your farm’s location"
+      className="h-48 w-full rounded-xl border border-navy/20 sm:h-52"
+      aria-label="Map of Texas. Click to mark your farm location."
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

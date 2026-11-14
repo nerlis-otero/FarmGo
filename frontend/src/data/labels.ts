@@ -1,6 +1,5 @@
-import type { Priority } from "@/types/recommendation";
+import type { CropId, Priority } from "@/types/recommendation";
 
-// Crop IDs must match the IDs agreed on by the team.
 export const CROP_NAMES: Record<string, string> = {
   corn: "Corn",
   cotton: "Cotton",
@@ -12,33 +11,29 @@ export const CROP_NAMES: Record<string, string> = {
   forage_grass: "Forage grass",
 };
 
-// "Corn → Soybeans → Cover crop oats"
-export function rotationName(crops: string[]): string {
+export function rotationName(crops: CropId[]): string {
   return crops.map((c) => CROP_NAMES[c] ?? c).join(" → ");
 }
 
-// "first corn, then soybeans, and then cover crop oats"
-export function rotationSentence(crops: string[]): string {
-  const names = crops.map((c) => (CROP_NAMES[c] ?? c).toLowerCase());
-  const starts = ["first", "then", "and then"];
-  return names.map((n, i) => `${starts[i] ?? "then"} ${n}`).join(", ");
-}
-
 export const PRIORITIES: { id: Priority; label: string; hint: string }[] = [
-  { id: "water_saving", label: "Save water", hint: "Drought-tolerant crops" },
-  { id: "profit", label: "Maximize profit", hint: "The highest-income option" },
-  { id: "soil_health", label: "Improve soil health", hint: "Protect the soil" },
-  { id: "balanced", label: "Balance priorities", hint: "Balance water, soil, and profit" },
+  { id: "Water Saving", label: "Save water", hint: "Favor crops that handle dry conditions" },
+  { id: "Profit", label: "Improve profit", hint: "Give market potential more weight" },
+  { id: "Soil Health", label: "Protect soil", hint: "Favor soil health and cover" },
+  { id: "Balanced", label: "Balance priorities", hint: "Consider water, soil, and market" },
 ];
 
 export function priorityLabel(id: Priority): string {
   return PRIORITIES.find((p) => p.id === id)?.label ?? id;
 }
 
-export function confidenceLabel(value: number): string {
-  if (value >= 0.75) return "high";
-  if (value >= 0.5) return "medium";
-  return "low";
+export function parsePriority(value: string | null): Priority {
+  const legacyValues: Record<string, Priority> = {
+    profit: "Profit",
+    water_saving: "Water Saving",
+    soil_health: "Soil Health",
+    balanced: "Balanced",
+  };
+  return PRIORITIES.find((item) => item.id === value)?.id ?? legacyValues[value ?? ""] ?? "Balanced";
 }
 
 // Show scores as words and colors instead of numbers alone.
@@ -51,15 +46,15 @@ export function rating(score: number): Rating {
 }
 
 export const RATING_WORDS: Record<Rating, string> = {
-  good: "Good",
+  good: "Strong",
   ok: "Fair",
-  low: "Weak",
+  low: "Low",
 };
 
 export const OVERALL_WORDS: Record<Rating, string> = {
-  good: "Best fit",
-  ok: "Fair option",
-  low: "Weak option",
+  good: "Strong fit",
+  ok: "Fair fit",
+  low: "Lower fit",
 };
 
 export const RATING_DOT: Record<Rating, string> = {

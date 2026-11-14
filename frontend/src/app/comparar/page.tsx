@@ -1,103 +1,84 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import BluebyStage from "@/components/BluebyStage";
-import NdviChart from "@/components/NdviChart";
 import RotationCard from "@/components/RotationCard";
 import { bluebySummary } from "@/data/blueby";
-import { priorityLabel, rotationName } from "@/data/labels";
-import { getMockRecommendation } from "@/data/mock";
-import type { Priority } from "@/types/recommendation";
+import { getDemoRecommendation } from "@/data/demo";
+import { parsePriority, priorityLabel } from "@/data/labels";
+import type { RecommendResponse } from "@/types/contracts";
 
 function Comparison() {
   const params = useSearchParams();
   const farm = params.get("farm") ?? "farm_1";
-  const priority = (params.get("priority") ?? "balanced") as Priority;
-  const rec = getMockRecommendation(farm, priority);
-  const [ndviId, setNdviId] = useState(rec.rotations[0].id);
-  const ndviRotation = rec.rotations.find((r) => r.id === ndviId) ?? rec.rotations[0];
+  const priority = parsePriority(params.get("priority"));
+  const recommendation: RecommendResponse = getDemoRecommendation(farm, priority);
 
-  // Keep lat and lon for when the real API (/recommend) is connected.
-  const keep = new URLSearchParams({ farm, priority });
-  const lat = params.get("lat");
-  const lon = params.get("lon");
-  if (lat && lon) {
-    keep.set("lat", lat);
-    keep.set("lon", lon);
-  }
-  const query = keep.toString();
+  const query = new URLSearchParams({ farm, priority }).toString();
+  const best = recommendation.rotations.find(
+    (rotation) => rotation.id === recommendation.best_rotation_id,
+  );
 
   return (
-    <div className="flex flex-col gap-10">
-      <div>
-        <Link href="/" className="font-bold text-indigo underline">
-          Start over
-        </Link>
+    <div className="flex flex-col gap-6">
+      <Link href="/" className="w-fit font-bold text-indigo underline underline-offset-4">
+        ← Change farm or priority
+      </Link>
+
+      <div className="rounded-xl border border-straw/80 bg-white/90 px-4 py-3 shadow-sm">
+        <p className="font-bold text-navy">Demo preview — illustrative results only</p>
+        <p className="text-base text-navy/70">
+          These sample crop plans and scores are not based on live farm data.
+        </p>
       </div>
 
-      <BluebyStage text={bluebySummary(rec)} />
+      <BluebyStage text={bluebySummary(recommendation)} />
 
-      <section className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Your 3 crop rotation options</h1>
-        <p>
-          Ranked from best to weakest based on your priority:{" "}
-          <strong>{priorityLabel(priority)}</strong>.
+      <section>
+        <p className="mb-1 text-sm font-bold uppercase tracking-[0.14em] text-fern">
+          Your goal: {priorityLabel(priority)}
         </p>
-        <p className="text-navy/80">
-          A crop rotation is the order in which you grow crops season after season.
+        <h1 className="text-3xl font-bold sm:text-4xl">Compare sample crop plans</h1>
+        <p className="mt-2 max-w-3xl text-navy/75">
+          A crop rotation is the order in which you grow crops across seasons. Compare each plan,
+          then open its details to see the example benefits and trade-offs.
         </p>
-        {rec.isMock && (
-          <p className="mt-1 w-fit rounded-md bg-straw px-3 py-1 font-bold">Sample data</p>
-        )}
       </section>
 
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {rec.rotations.map((r, i) => (
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {recommendation.rotations.map((rotation) => (
           <RotationCard
-            key={r.id}
-            rotation={r}
-            isBest={i === 0}
-            href={`/rotacion/${r.id}?${query}`}
+            key={rotation.id}
+            rotation={rotation}
+            isBest={rotation.id === recommendation.best_rotation_id}
+            href={`/rotacion/${rotation.id}?${query}`}
           />
         ))}
       </section>
 
-      <section className="rounded-xl border border-navy/20 bg-white p-5">
-        <h2 className="text-2xl font-bold">Your crop’s growth throughout the year</h2>
-        <p className="mb-4 mt-1 text-navy/80">
-          The line shows how green and healthy the field is each month, measured using satellite
-          imagery.
-        </p>
-        <div className="mb-4 flex flex-wrap gap-3">
-          {rec.rotations.map((r) => (
-            <button
-              key={r.id}
-              type="button"
-              aria-pressed={ndviRotation.id === r.id}
-              onClick={() => setNdviId(r.id)}
-              className={`rounded-lg border-2 px-4 py-2 font-bold ${
-                ndviRotation.id === r.id
-                  ? "border-indigo bg-indigo text-white"
-                  : "border-navy hover:bg-mist"
-              }`}
-            >
-              {rotationName(r.crops)}
-            </button>
-          ))}
-        </div>
-        <NdviChart data={ndviRotation.ndvi} />
-      </section>
+      {best && (
+        <section className="rounded-2xl border border-fern/20 bg-white/95 p-5 shadow-soft sm:p-6">
+          <p className="mb-1 text-sm font-bold uppercase tracking-[0.14em] text-fern">
+            Why this sample ranks first
+          </p>
+          <h2 className="text-2xl font-bold">{best.label}</h2>
+          <p className="mt-2">{best.why}</p>
+          {best.benefits.length > 0 && (
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-navy/80">
+              {best.benefits.map((benefit) => <li key={benefit}>{benefit}</li>)}
+            </ul>
+          )}
+        </section>
+      )}
 
-      <section className="rounded-xl bg-mist p-5">
-        <h2 className="text-2xl font-bold">Before you decide</h2>
-        <p className="mt-1">Confirm these details with a local expert. Keep in mind:</p>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
-          {rec.gaps.map((g) => (
-            <li key={g}>{g}</li>
-          ))}
+      <section className="rounded-2xl bg-mist/90 p-5">
+        <h2 className="text-xl font-bold">About this demo</h2>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-base text-navy/80">
+          {recommendation.data_notes.map((note) => <li key={note}>{note}</li>)}
         </ul>
+        <p className="mt-3 text-base">{recommendation.disclaimer}</p>
       </section>
     </div>
   );
@@ -105,7 +86,7 @@ function Comparison() {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={<p>Loading your options…</p>}>
+    <Suspense fallback={<p role="status">Loading your sample plans…</p>}>
       <Comparison />
     </Suspense>
   );

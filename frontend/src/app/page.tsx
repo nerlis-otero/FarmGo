@@ -1,10 +1,9 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import BluebyStage from "@/components/BluebyStage";
 import MapPicker from "@/components/MapPicker";
-import { FARMS } from "@/data/farms";
 import { PRIORITIES } from "@/data/labels";
 import { isInsideTexas } from "@/lib/texas";
 import type { Priority } from "@/types/recommendation";
@@ -12,45 +11,43 @@ import type { Priority } from "@/types/recommendation";
 type Step = "location" | "priority";
 type Selected = { farmId: string; lat: number; lon: number } | null;
 
-function HomeContent() {
+export default function Home() {
   const router = useRouter();
-  // Team demo mode: open the page with ?demo=1 to see sample farms.
-  const demo = useSearchParams().get("demo") === "1";
-
   const [step, setStep] = useState<Step>("location");
   const [selected, setSelected] = useState<Selected>(null);
   const [priority, setPriority] = useState<Priority | null>(null);
   const [locating, setLocating] = useState(false);
-  const [geoError, setGeoError] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   const outsideTexas = selected ? !isInsideTexas(selected.lat, selected.lon) : false;
-
-  // What Blueby says at each step.
-  const text =
-    step === "location"
-      ? selected
+  const bluebyText =
+    step === "priority"
+      ? "Pick what matters most to your farm this season. I’ll sort the example options around that goal."
+      : selected
         ? outsideTexas
-          ? "I marked your location, but for now I only have detailed data for Texas."
-          : "Done! I marked your farm. Click “Next.”"
-        : "Hi! I’m Blueby, and I’ll help you choose what to grow. First, tell me where your farm is."
-      : priority
-        ? "Great! I’m finding your 3 best options."
-        : "What matters most to you this season?";
+          ? "Your location is marked. This preview is designed for Texas, so results elsewhere are only examples."
+          : "Your farm is marked. Next, choose what matters most this season."
+        : "Hi, I’m Blueby! Mark your farm on the map or use your current location. Then choose a goal to see a sample crop plan.";
 
   function useMyLocation() {
     if (!navigator.geolocation) {
-      setGeoError("Your browser doesn’t allow location access. Click the map to mark your farm.");
+      setLocationError("Location access isn’t available in this browser. Click the map to mark your farm.");
       return;
     }
+
     setLocating(true);
-    setGeoError(null);
+    setLocationError(null);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setSelected({ farmId: "custom", lat: pos.coords.latitude, lon: pos.coords.longitude });
+      (position) => {
+        setSelected({
+          farmId: "custom",
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        });
         setLocating(false);
       },
       () => {
-        setGeoError("We couldn’t get your location. Click the map to mark your farm.");
+        setLocationError("We couldn’t get your location. Click the map to mark your farm instead.");
         setLocating(false);
       },
       { enableHighAccuracy: true, timeout: 10000 },
@@ -59,129 +56,134 @@ function HomeContent() {
 
   function goToComparison() {
     if (!selected || !priority) return;
-    const q = new URLSearchParams({
+    const query = new URLSearchParams({
       farm: selected.farmId,
       lat: String(selected.lat),
       lon: String(selected.lon),
       priority,
     });
-    router.push(`/comparar?${q.toString()}`);
+    router.push(`/comparar?${query.toString()}`);
   }
 
   return (
-    <BluebyStage text={text}>
-      {step === "location" ? (
-        <div className="flex flex-col gap-4 rounded-xl border border-navy/20 bg-white p-5">
-          <h1 className="text-2xl font-bold">1. Where is your farm?</h1>
-
-          <div className="flex flex-col gap-1">
-            <button
-              type="button"
-              onClick={useMyLocation}
-              disabled={locating}
-              className="w-fit rounded-lg border-2 border-indigo px-6 py-3 font-bold text-indigo hover:bg-mist disabled:opacity-40"
-            >
-              {locating ? "Finding your location…" : "Use my location"}
-            </button>
-            <p className="text-base text-navy/80">
-              We only use it to find data for your area.
-            </p>
-            {geoError && <p className="font-bold text-low">{geoError}</p>}
-          </div>
-
-          <p>Or click the map to mark your farm:</p>
-          <MapPicker
-            position={selected ? [selected.lat, selected.lon] : null}
-            onSelect={(lat, lon) => setSelected({ farmId: "custom", lat, lon })}
-          />
-
-          {selected && <p className="font-bold text-fern">✓ Your farm is marked.</p>}
-          {outsideTexas && (
-            <p className="rounded-lg bg-straw px-4 py-3 font-bold">
-              This version is designed for Texas. Results may not be reliable outside the state.
-            </p>
-          )}
-
-          {demo && (
-            <div className="flex flex-col gap-2 rounded-lg bg-mist p-4">
-              <p className="font-bold">Demo mode: sample farms</p>
-              <div className="flex flex-wrap gap-3">
-                {FARMS.map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    onClick={() => setSelected({ farmId: f.id, lat: f.lat, lon: f.lon })}
-                    className="rounded-lg border-2 border-navy bg-white px-4 py-2 font-bold"
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <button
-            type="button"
-            disabled={!selected}
-            onClick={() => setStep("priority")}
-            className="w-fit rounded-lg bg-indigo px-8 py-3 text-lg font-bold text-white disabled:opacity-40"
+    <BluebyStage text={bluebyText}>
+      <div className="flex flex-col gap-4 rounded-2xl border border-navy/10 bg-white/95 p-4 shadow-soft sm:p-5">
+        <ol aria-label="Setup progress" className="flex flex-wrap gap-2 text-sm">
+          <li
+            aria-current={step === "location" ? "step" : undefined}
+            className={`rounded-full px-3 py-1.5 font-bold ${
+              step === "location" ? "bg-indigo text-white" : "bg-mist text-navy/70"
+            }`}
           >
-            Next
-          </button>
-        </div>
-      ) : (
-        <fieldset className="flex flex-col gap-4 rounded-xl border border-navy/20 bg-white p-5">
-          <legend className="px-2 text-2xl font-bold">2. Choose what matters most to you</legend>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {PRIORITIES.map((p) => (
-              <label
-                key={p.id}
-                className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 ${
-                  priority === p.id ? "border-indigo bg-mist" : "border-navy/20"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="priority"
-                  value={p.id}
-                  checked={priority === p.id}
-                  onChange={() => setPriority(p.id)}
-                  className="mt-1 h-6 w-6 accent-indigo"
-                />
-                <span>
-                  <span className="block font-bold">{p.label}</span>
-                  <span className="text-base text-navy/80">{p.hint}</span>
-                </span>
-              </label>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => setStep("location")}
-              className="rounded-lg border-2 border-navy px-6 py-3 font-bold hover:bg-mist"
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              disabled={!priority}
-              onClick={goToComparison}
-              className="rounded-lg bg-indigo px-8 py-3 text-lg font-bold text-white disabled:opacity-40"
-            >
-              See my 3 options
-            </button>
-          </div>
-        </fieldset>
-      )}
-    </BluebyStage>
-  );
-}
+            1 · Farm location
+          </li>
+          <li
+            aria-current={step === "priority" ? "step" : undefined}
+            className={`rounded-full px-3 py-1.5 font-bold ${
+              step === "priority" ? "bg-indigo text-white" : "bg-mist text-navy/70"
+            }`}
+          >
+            2 · Your goal
+          </li>
+        </ol>
 
-export default function Home() {
-  return (
-    <Suspense fallback={<p>Loading…</p>}>
-      <HomeContent />
-    </Suspense>
+        {step === "location" ? (
+          <>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h1 className="text-2xl font-bold sm:text-3xl">Mark your farm location</h1>
+                <p className="text-base text-navy/70">Tap the map, or use your current location.</p>
+              </div>
+              <button
+                type="button"
+                onClick={useMyLocation}
+                disabled={locating}
+                className="min-h-10 rounded-lg border-2 border-indigo px-4 py-1.5 text-base font-bold text-indigo hover:bg-mist disabled:opacity-50"
+              >
+                {locating ? "Finding location…" : "Use my location"}
+              </button>
+            </div>
+
+            {locationError && <p role="alert" className="text-base font-semibold text-low">{locationError}</p>}
+            <MapPicker
+              position={selected ? [selected.lat, selected.lon] : null}
+              onSelect={(lat, lon) => {
+                setSelected({ farmId: "custom", lat, lon });
+                setLocationError(null);
+              }}
+            />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {selected ? (
+                <p className="text-base font-semibold text-fern">
+                  ✓ Farm location marked
+                </p>
+              ) : (
+                <p className="text-base text-navy/70">
+                  Your location is not saved.
+                </p>
+              )}
+              <button
+                type="button"
+                disabled={!selected}
+                onClick={() => setStep("priority")}
+                className="min-h-10 rounded-lg bg-indigo px-6 py-1.5 font-bold text-white shadow-sm transition hover:bg-navy disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Continue
+              </button>
+            </div>
+            {outsideTexas && (
+              <p className="rounded-lg bg-straw px-3 py-2 text-sm font-semibold">
+                This preview is designed for Texas. Results outside the state are only examples.
+              </p>
+            )}
+          </>
+        ) : (
+          <fieldset className="flex flex-col gap-3">
+            <legend className="text-2xl font-bold sm:text-3xl">What matters most this season?</legend>
+            <p className="text-base text-navy/75">Choose one goal. You can change it later.</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {PRIORITIES.map((option) => (
+                <label
+                  key={option.id}
+                  className={`flex min-h-24 cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
+                    priority === option.id ? "border-fern bg-foam" : "border-navy/15 bg-white hover:border-fern"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="priority"
+                    value={option.id}
+                    checked={priority === option.id}
+                    onChange={() => setPriority(option.id)}
+                    className="mt-1 h-5 w-5 accent-indigo"
+                  />
+                  <span>
+                    <span className="block font-bold">{option.label}</span>
+                    <span className="mt-1 block text-base text-navy/70">{option.hint}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setStep("location")}
+                className="min-h-12 rounded-lg border-2 border-navy/25 px-5 py-2 font-bold hover:bg-mist"
+              >
+                Back to farm
+              </button>
+              <button
+                type="button"
+                disabled={!priority}
+                onClick={goToComparison}
+                className="min-h-12 rounded-lg bg-indigo px-7 py-2 font-bold text-white shadow-sm transition hover:bg-navy disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Show my sample plan
+              </button>
+            </div>
+          </fieldset>
+        )}
+      </div>
+    </BluebyStage>
   );
 }

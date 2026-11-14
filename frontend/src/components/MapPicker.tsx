@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 
-// Leaflet necesita el navegador: se carga sin renderizado en servidor.
+// Leaflet requires a browser, so it is loaded without server-side rendering.
 const MapPicker = dynamic(() => import("./FarmMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-72 w-full items-center justify-center rounded-xl bg-mist md:h-96">
+    <div className="flex h-48 w-full items-center justify-center rounded-xl bg-mist sm:h-52">
       Loading map…
     </div>
   ),

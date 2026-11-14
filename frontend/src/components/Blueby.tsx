@@ -46,7 +46,7 @@ export default function Blueby({ talking = false }: { talking?: boolean }) {
   return (
     <div
       aria-hidden="true"
-      className="relative aspect-[39/65] w-[78px] shrink-0 md:w-[156px]"
+      className="relative aspect-[39/65] w-[88px] shrink-0 sm:w-[112px]"
     >
       {FRAMES.map((f) => (
         // eslint-disable-next-line @next/next/no-img-element
