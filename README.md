@@ -1,4 +1,4 @@
-# 🌱 FarmFuture AI
+# FarmFuture AI
 
 **Recomendación de cultivos y rotación para agricultores de Texas, combinando datos de la NASA, suelo, clima y mercado.**
 
@@ -6,30 +6,30 @@ Proyecto para el reto **"Field Shift: Adapting Farms with NASA Data"** — NASA 
 
 ---
 
-## 🎯 ¿Qué hace?
+## ¿Qué hace?
 
 El agricultor comparte su ubicación y elige qué quiere priorizar. FarmFuture AI analiza clima, suelo y mercado con tres agentes especializados y entrega una recomendación clara y explicada:
 
-- 🌾 **Mejor cultivo para sembrar**
-- 💰 **Mejor cultivo para vender**
-- 🔄 **Rotación recomendada**
-- ⭐ **Mejor cultivo en general**
+- **Mejor cultivo para sembrar**
+- **Mejor cultivo para vender**
+- **Rotación recomendada**
+- **Mejor cultivo en general**
 
 **Prioridades disponibles:** `Profit` · `Water Saving` · `Soil Health` · `Balanced`
 
 ---
 
-## 🧩 Arquitectura
+## Arquitectura
 
 ```
  NASA POWER · GPM/IMERG · SMAP        SSURGO · CropScape · SMAP        USDA AMS · NASS QuickStats
               │                                  │                                 │
               ▼                                  ▼                                 ▼
-       ☀️ Climate Agent               🌱 Soil & Rotation Agent               💰 Market Agent
+         Climate Agent                 Soil & Rotation Agent                 Market Agent
               │                                  │                                 │
               └──────────────────────┬───────────┴─────────────────────────────────┘
                                      ▼
-                          🧠 Recommendation Engine
+                            Recommendation Engine
                        (no consulta bases de datos)
                                      │
                                      ▼
@@ -38,7 +38,7 @@ El agricultor comparte su ubicación y elige qué quiere priorizar. FarmFuture A
 
 SMAP (humedad del suelo) se comparte entre el Climate Agent y el Soil & Rotation Agent, por lo que se consulta una sola vez.
 
-### ☀️ Climate Agent
+### Climate Agent
 **Pregunta:** ¿Qué cultivos son viables con el clima actual e histórico?
 
 | Fuente | Datos |
@@ -55,7 +55,7 @@ SMAP (humedad del suelo) se comparte entre el Climate Agent y el Soil & Rotation
 }
 ```
 
-### 🌱 Soil & Rotation Agent
+### Soil & Rotation Agent
 **Pregunta:** ¿Qué rotación mejora la salud del suelo?
 
 | Fuente | Datos |
@@ -72,7 +72,7 @@ SMAP (humedad del suelo) se comparte entre el Climate Agent y el Soil & Rotation
 }
 ```
 
-### 💰 Market Agent
+### Market Agent
 **Pregunta:** ¿Qué cultivo será más rentable en la cosecha?
 
 | Fuente | Datos |
@@ -88,7 +88,7 @@ SMAP (humedad del suelo) se comparte entre el Climate Agent y el Soil & Rotation
 }
 ```
 
-### 🧠 Recommendation Engine
+### Recommendation Engine
 Recibe **únicamente** las salidas de los tres agentes, junto con la prioridad elegida por el usuario, y combina los puntajes según esa prioridad.
 
 ```json
@@ -114,7 +114,7 @@ Recibe **únicamente** las salidas de los tres agentes, junto con la prioridad e
 
 ---
 
-## 🚀 Ejecución
+## Ejecución
 
 ```bash
 git clone https://github.com/nerlis-otero/farmfuture-ai.git
@@ -124,7 +124,7 @@ cd farmfuture-ai
 
 ---
 
-## ⚠️ Limitaciones
+## Limitaciones
 
 - Es una **guía de apoyo**, no una garantía ni un reemplazo del criterio del agricultor o de un agrónomo.
 - Los **precios** se publican por producto y mercado, no por condado, y no incluyen costos de producción completos: el margen es una estimación.
@@ -133,7 +133,7 @@ cd farmfuture-ai
 
 ---
 
-## 👥 Equipo y licencia
+##  Equipo y licencia
 
 `[COMPLETAR: integrantes, sede/equipo y licencia]`
 
