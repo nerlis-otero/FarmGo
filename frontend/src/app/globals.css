@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy: #1a3329;
-  --color-bluebonnet: #7a9a88;
-  --color-indigo: #2a6b45;
-  --color-mist: #dde8df;
-  --color-foam: #eef3e8;
-  --color-page: #f4f6ef;
-  --color-field: #6fa876;
-  --color-fern: #3a8b55;
-  --color-straw: #f0e2c0;
-  --color-ok: #b07820;
-  --color-low: #a84538;
-  --shadow-soft: 0 14px 40px rgb(26 51 41 / 8%);
+  /* Paleta Ivory & Sky Earth */
+  --color-page: #feffef;          /* IVORY (#FEFFEF): Fondo principal cálido y luminoso */
+  --color-navy: #233b14;          /* Tono profundo de Mushroom Green: Títulos, encabezados y bordes contrastados */
+  --color-body: #3d4a36;          /* Tono tierra oscuro para textos y párrafos legibles */
+  --color-fern: #447027;          /* MUSHROOM GREEN (#447027): Verdor de identidad, Best Plan, éxito y logo */
+  --color-field: #5b8e3a;         /* MUSHROOM GREEN medio: Acentos vegetales y fondo de campos */
+  --color-indigo: #52aae9;        /* NOBEL SKY BLUE (#52AAE9): Botones de acción principales y enlaces */
+  --color-bluebonnet: #52aae9;    /* NOBEL SKY BLUE (#52AAE9): Acento cielo */
+  --color-straw: #e1ea7b;         /* DUSTY LEMON (#E1EA7B): Sol, avisos, acentos y resaltes */
+  --color-ok: #a38510;            /* Tono accesible para puntuaciones medias */
+  --color-low: #d66452;           /* Tono cálido para puntuaciones bajas */
+  --color-foam: #f2f8e4;          /* Tinte Ivory + Verdor: Fondo de tarjeta destacada */
+  --color-mist: #e8f4fc;          /* Tinte Ivory + Sky Blue: Chips secundarios y etiquetas */
+  --shadow-soft: 0 12px 36px rgb(35 59 20 / 8%);
 }
 
 @layer components {
