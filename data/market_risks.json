@@ -1,0 +1,14 @@
+{
+  "corn": [
+    "Price fluctuations due to global grain markets.",
+    "High fertilizer dependency."
+  ],
+  "cotton": [
+    "Sensitive to export demand.",
+    "Can require significant irrigation."
+  ],
+  "sorghum": [
+    "Lower market size than corn.",
+    "Regional demand variability."
+  ]
+}

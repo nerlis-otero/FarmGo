@@ -1,0 +1,8 @@
+template_id,label,season_1,season_2,season_3,same_family_adjacent,includes_legume,includes_cover_crop,notes
+tpl_01,Sorgo → Soya → Avena (cobertura),sorghum,soybean,oats_cover,false,true,true,Ahorro de agua + leguminosa + cobertura de invierno.
+tpl_02,Trigo → Maní → Pasto forrajero,wheat,peanut,forage_grass,false,true,false,Equilibrio ingreso/suelo; forraje como ingreso adicional.
+tpl_03,Maíz → Soya → Trigo,corn,soybean,wheat,false,true,false,Rotación clásica cereal-leguminosa-cereal de invierno.
+tpl_04,Algodón → Avena (cobertura) → Maní,cotton,oats_cover,peanut,false,true,true,Para zonas algodoneras: cobertura tras el algodón y leguminosa después.
+tpl_05,Sorgo → Maní → Trigo,sorghum,peanut,wheat,false,true,false,"Baja demanda de agua, leguminosa en medio y cereal de invierno."
+tpl_06,Maíz → Maní → Avena (cobertura),corn,peanut,oats_cover,false,true,true,Leguminosa después del cereal más cobertura de invierno.
+tpl_07,Maíz → Sorgo → Trigo,corn,sorghum,wheat,true,false,false,CONTROL NEGATIVO: tres cereales de la misma familia y sin leguminosa. Debe puntuar bajo en suelo.

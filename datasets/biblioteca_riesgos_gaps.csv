@@ -1,0 +1,23 @@
+﻿id,aplica_a,tipo,descripcion,fuente,estado_fuente
+L01,todos,limitacion_datos,"Los rendimientos y precios son promedios de todo Texas, no de tu finca ni de tu condado.",Archivos NASS QuickStats descargados (nivel STATE),verificada
+L02,todos,limitacion_datos,"Los precios no incluyen los costos de producción, así que el margen de ganancia es solo una estimación.","README de FarmFuture AI, sección Limitaciones",verificada
+L03,todos,limitacion_datos,"El precio de cada cultivo viene en una unidad distinta (bushel, libra, quintal) y no se puede comparar directamente sin convertirlo.","Archivos NASS, columna unit_desc",verificada
+L04,todos,limitacion_datos,Los promedios usan los años 2020 a 2025; el 2026 se dejó fuera porque el año no ha terminado.,"Archivos NASS, columna reference_period_desc (pronósticos 2026)",verificada
+L05,todos,limitacion_datos,El rendimiento mezcla fincas con riego y sin riego (todas las prácticas de producción).,"Archivos NASS, columna prodn_practice_desc = ALL PRODUCTION PRACTICES",verificada
+L06,todos,limitacion_datos,El precio local por condado no está disponible; NASS publica el precio por estado.,Mock data/mocks/recommend_farm_1.json (gaps) y README,verificada
+L07,todos,limitacion_datos,"La humedad del suelo de NASA POWER es modelada, no observada por satélite.","docs/contracts.md, principio 4",verificada
+L08,corn,limitacion_datos,El rendimiento del maíz es solo de grano; el maíz para ensilaje (forraje) no está incluido.,Archivos NASS (se excluyó SILAGE),verificada
+L09,sorghum,limitacion_datos,El rendimiento del sorgo es solo de grano; el sorgo para ensilaje (forraje) no está incluido.,Archivos NASS (se excluyó SILAGE),verificada
+L10,cotton,limitacion_datos,El precio del algodón es solo de fibra Upland; no incluye la semilla de algodón ni el algodón Pima.,Archivos NASS (se excluyó COTTONSEED y PIMA),verificada
+L11,corn,limitacion_datos,El rendimiento del maíz cambió mucho de un año a otro (de 95 a 135 bushels por acre) y el precio también (de 4.52 a 7.57 $/bushel).,economia_cultivos_texas.xlsx (cálculo propio con datos NASS 2020-2025),verificada
+L12,cotton,limitacion_datos,El rendimiento del algodón varió entre 618 y 734 libras por acre y el precio entre 0.598 y 0.932 $/libra.,economia_cultivos_texas.xlsx (cálculo propio con datos NASS 2020-2025),verificada
+L13,sorghum,limitacion_datos,El rendimiento del sorgo varió entre 49 y 63 bushels por acre y el precio entre 7.12 y 11.00 $/quintal.,economia_cultivos_texas.xlsx (cálculo propio con datos NASS 2020-2025),verificada
+E01,todos,revisar_experto,Confirmar con un experto local qué variedades y fechas de siembra convienen en tu zona.,Pendiente: consultar Texas A&M AgriLife Extension,por verificar
+E02,todos,revisar_experto,"Confirmar si tu finca tiene riego y de qué tipo, porque eso cambia los rendimientos esperados.","Mock data/mocks/recommend_farm_1.json (gaps: ""No se conoce el sistema de riego"")",verificada
+E03,todos,revisar_experto,Verificar que tienes (o puedes conseguir) el equipo necesario para cada cultivo de la rotación.,Mock data/mocks/recommend_farm_1.json (risks),verificada
+E04,todos,revisar_experto,Consultar compradores o cooperativas de tu zona para conocer el precio real al que podrías vender.,Pendiente: consultar Texas A&M AgriLife Extension,por verificar
+E05,cotton,revisar_experto,Revisar con un experto las necesidades de agua y los costos de producción del algodón en tu zona.,Pendiente: consultar Texas A&M AgriLife Extension,por verificar
+E06,corn,revisar_experto,Revisar con un experto las necesidades de agua y los costos de producción del maíz en tu zona.,Pendiente: consultar Texas A&M AgriLife Extension,por verificar
+E07,sorghum,revisar_experto,Revisar con un experto las necesidades de agua y los costos de producción del sorgo en tu zona.,Pendiente: consultar Texas A&M AgriLife Extension,por verificar
+R01,rotaciones,revisar_experto,"Antes de adoptar una rotación nueva, validar las fechas de siembra y cosecha de cada temporada con un experto local.","Mock data/mocks/recommend_farm_1.json (risks, rot_01)",verificada
+R02,rotaciones,revisar_experto,"Las reglas agronómicas de la rotación (por ejemplo, leguminosa después de cereal) deben coincidir con las de docs/reglas_suelo.md de la integrante 3.",Pendiente: docs/reglas_suelo.md (integrante 3),por verificar

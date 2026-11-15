@@ -13,7 +13,8 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.contracts import PRIORITY_WEIGHTS, RecommendRequest, RecommendResponse
+from app.contracts import PRIORITY_WEIGHTS, CropId, MarketMetrics, RecommendRequest, RecommendResponse
+from app.services.market_service import get_market_metrics
 
 ROOT = Path(__file__).resolve().parents[2]  # raiz del repo
 MOCK_PATH = ROOT / "data" / "mocks" / "recommend_farm_1.json"
@@ -49,7 +50,10 @@ def farms() -> list[dict]:
     return load_farms()
 
 
-@app.post("/recommend", response_model=RecommendResponse)
+@app.post(
+    "/recommend",
+    responses={404: {"description": "Finca desconocida"}},
+)
 def recommend(req: RecommendRequest) -> RecommendResponse:
     if req.farm_id and req.farm_id not in {f["farm_id"] for f in load_farms()}:
         raise HTTPException(status_code=404, detail=f"Finca desconocida: {req.farm_id}")
@@ -74,3 +78,11 @@ def recommend(req: RecommendRequest) -> RecommendResponse:
             "best_rotation_id": best.id,
         }
     )
+
+@app.get("/market", response_model=MarketMetrics)
+def market(crops: str = "corn,cotton,sorghum") -> MarketMetrics:
+    try:
+        ids = [CropId(c.strip()) for c in crops.split(",")]
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Cultivo desconocido")
+    return get_market_metrics(ids)
