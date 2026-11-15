@@ -15,8 +15,15 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 
-from app.contracts import PRIORITY_WEIGHTS, RecommendRequest, RecommendResponse
+from app.contracts import (
+    PRIORITY_WEIGHTS,
+    CropId,
+    MarketMetrics,
+    RecommendRequest,
+    RecommendResponse,
+)
 from app.location_analysis import recommend_for_location
+from app.services.market_service import get_market_metrics
 
 ROOT = Path(__file__).resolve().parents[2]  # raiz del repo
 MOCK_PATH = ROOT / "data" / "mocks" / "recommend_farm_1.json"
@@ -53,7 +60,7 @@ def farms() -> list[dict]:
     return load_farms()
 
 
-@app.post("/recommend", response_model=RecommendResponse)
+@app.post("/recommend", response_model=RecommendResponse, responses={404: {"description": "Finca desconocida"}})
 def recommend(req: RecommendRequest) -> RecommendResponse:
     if req.lat is not None and req.lon is not None:
         try:
@@ -128,3 +135,11 @@ def recommend(req: RecommendRequest) -> RecommendResponse:
             "best_rotation_id": best.id,
         }
     )
+
+@app.get("/market", response_model=MarketMetrics)
+def market(crops: str = "corn,cotton,sorghum") -> MarketMetrics:
+    try:
+        ids = [CropId(c.strip()) for c in crops.split(",")]
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Cultivo desconocido")
+    return get_market_metrics(ids)
