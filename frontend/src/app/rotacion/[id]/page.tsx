@@ -5,7 +5,14 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import BluebyStage from "@/components/BluebyStage";
 import Indicators from "@/components/Indicators";
-import { parsePriority, priorityLabel, rotationName } from "@/data/labels";
+import {
+  OVERALL_WORDS,
+  RATING_DOT,
+  parsePriority,
+  priorityLabel,
+  rating,
+  rotationName,
+} from "@/data/labels";
 import { useRecommendation } from "@/hooks/useRecommendation";
 import { CROP_IDS, type CropId } from "@/types/contracts";
 
@@ -42,14 +49,22 @@ function Detail() {
   const backHref = `/comparar?${query}`;
 
   if (loading) {
-    return <p role="status" className="rounded-xl bg-white/90 p-5">Loading plan details…</p>;
+    return (
+      <p role="status" className="rounded-xl bg-white/90 p-5">
+        Loading plan details…
+      </p>
+    );
   }
   if (error || !recommendation) {
     return (
       <section role="alert" className="rounded-2xl bg-white/95 p-6 shadow-soft">
         <h1 className="text-2xl font-bold">We couldn’t load this plan</h1>
         <p className="mt-2">{error}</p>
-        <button type="button" onClick={retry} className="mt-4 rounded-lg bg-indigo px-5 py-3 font-bold text-white">
+        <button
+          type="button"
+          onClick={retry}
+          className="mt-4 rounded-lg bg-indigo px-5 py-3 font-bold text-white"
+        >
           Try again
         </button>
       </section>
@@ -68,88 +83,127 @@ function Detail() {
     );
   }
 
-  const sections = [
+  const overall = rating(rotation.scores.total);
+  const primarySections = [
     { title: "Potential benefits", items: rotation.benefits },
-    { title: "Example evidence", items: rotation.evidence },
     { title: "Things to check", items: rotation.gaps },
+  ].filter((section) => section.items.length > 0);
+  const moreSections = [
+    { title: "Example evidence", items: rotation.evidence },
     { title: "Possible trade-offs", items: rotation.risks },
   ].filter((section) => section.items.length > 0);
+  const dataChip =
+    source === "saved-demo"
+      ? "Demo fallback"
+      : farm === "custom"
+        ? "Live climate for your pin"
+        : "Sample farm data";
 
   return (
-    <div className="flex flex-col gap-7">
-      <Link href={backHref} className="w-fit font-bold text-indigo underline underline-offset-4">
-        ← Back to crop plans
-      </Link>
-
-      <div className="rounded-xl border border-straw/80 bg-white/90 px-4 py-3 shadow-sm">
-        <p className="font-bold text-navy">
-          {source === "saved-demo"
-            ? "Using saved demo results"
-            : farm === "custom"
-              ? "Climate data for your marked location"
-              : "Sample data: High Plains (Lubbock)"}
-        </p>
-        <p className="text-base text-navy/70">
-          {source === "saved-demo"
-            ? "Location-based climate data could not be loaded, so these saved Lubbock examples are shown instead. They do not use your marked location."
-            : farm === "custom"
-              ? "Climate scores use NASA POWER data for the coordinates you marked. Soil scores use draft crop traits, and market scores use Texas-wide data where available; neither is measured for your field."
-              : "This example uses Lubbock test data, not your field data. Scores reflect the goal you selected."}
-        </p>
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Link href={backHref} className="w-fit font-bold text-indigo underline underline-offset-4">
+          ← Back to plans
+        </Link>
+        <span className="rounded-full bg-mist px-3 py-1 text-sm font-semibold text-navy/75">
+          {dataChip}
+        </span>
       </div>
 
-      <BluebyStage text={rotation.why} />
+      <BluebyStage
+        text={
+          rotation.why.length > 90
+            ? `${OVERALL_WORDS[overall]} for your ${priorityLabel(priority).toLowerCase()} goal.`
+            : rotation.why
+        }
+        compact
+      />
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-2">
         <div className="flex flex-wrap gap-2">
           {rotation.id === recommendation.best_rotation_id && (
-            <span className="rounded-full bg-fern px-3 py-1 text-sm font-bold text-white">
-              Top score for your goal
+            <span className="rounded-full bg-fern px-2.5 py-0.5 text-xs font-bold text-white">
+              Best for your goal
             </span>
           )}
           {rotation.is_current && (
-            <span className="rounded-full bg-mist px-3 py-1 text-sm font-bold">
-              Example current rotation
+            <span className="rounded-full bg-mist px-2.5 py-0.5 text-xs font-bold text-navy/80">
+              Your crops
             </span>
           )}
         </div>
         <h1 className="text-3xl font-bold sm:text-4xl">
           {rotation.sequence.length > 0 ? rotationName(rotation.sequence) : rotation.label}
         </h1>
-        <p>
-          Your goal: <strong>{priorityLabel(priority)}</strong>
+        <p className="flex flex-wrap items-center gap-2 font-bold">
+          <span className={`h-3 w-3 rounded-full ${RATING_DOT[overall]}`} aria-hidden="true" />
+          {OVERALL_WORDS[overall]}
+          <span className="font-semibold text-navy/55">· {rotation.scores.total}/100</span>
+          <span className="font-medium text-navy/55">· {priorityLabel(priority)}</span>
         </p>
+        <p className="text-navy/75">{rotation.why}</p>
       </section>
 
-      <section className="max-w-xl rounded-2xl border border-navy/10 bg-white/95 p-5 shadow-soft">
-        <h2 className="mb-4 text-2xl font-bold">How is this plan scored?</h2>
+      <section className="max-w-xl rounded-2xl border border-navy/10 bg-white/95 p-4 shadow-soft sm:p-5">
+        <h2 className="mb-3 text-lg font-bold">Scores</h2>
         <Indicators scores={rotation.scores} />
-        <p className="mt-4 border-t border-navy/10 pt-3 font-bold">
-          Overall score for this goal: {rotation.scores.total} out of 100
-        </p>
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        {sections.map((section) => (
-          <section
-            key={section.title}
-            className="rounded-2xl border border-navy/10 bg-white/95 p-5 shadow-sm"
-          >
-            <h2 className="text-xl font-bold">{section.title}</h2>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-navy/80">
-              {section.items.map((item) => <li key={item}>{item}</li>)}
+      {primarySections.length > 0 && (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {primarySections.map((section) => (
+            <section
+              key={section.title}
+              className="rounded-2xl border border-navy/10 bg-white/95 p-4 shadow-sm sm:p-5"
+            >
+              <h2 className="text-lg font-bold">{section.title}</h2>
+              <ul className="mt-2 list-disc space-y-1.5 pl-5 text-navy/80">
+                {section.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
+
+      {moreSections.length > 0 && (
+        <details className="panel rounded-2xl border border-navy/10 bg-white/95 shadow-sm">
+          <summary className="flex items-center justify-between gap-3 px-4 py-3 font-bold sm:px-5">
+            <span>More detail</span>
+            <span className="text-sm font-semibold text-navy/55">Show</span>
+          </summary>
+          <div className="grid gap-3 border-t border-navy/10 p-4 sm:grid-cols-2 sm:p-5">
+            {moreSections.map((section) => (
+              <section key={section.title}>
+                <h2 className="font-bold">{section.title}</h2>
+                <ul className="mt-2 list-disc space-y-1.5 pl-5 text-navy/80">
+                  {section.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        </details>
+      )}
+
+      <details className="panel rounded-2xl border border-navy/10 bg-mist/80">
+        <summary className="flex items-center justify-between gap-3 px-4 py-3 font-bold sm:px-5">
+          <span>About the data</span>
+          <span className="text-sm font-semibold text-navy/55">Show</span>
+        </summary>
+        <div className="border-t border-navy/10 px-4 py-4 text-sm text-navy/80 sm:px-5">
+          <p>{recommendation.disclaimer}</p>
+          {recommendation.data_notes.length > 0 && (
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {recommendation.data_notes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
             </ul>
-          </section>
-        ))}
-      </div>
-
-      <section className="rounded-2xl bg-mist/90 p-5">
-        <h2 className="text-xl font-bold">Before you decide</h2>
-        <p className="mt-2 text-base">{recommendation.disclaimer}</p>
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-base text-navy/80">
-          {recommendation.data_notes.map((note) => <li key={note}>{note}</li>)}
-        </ul>
-      </section>
+          )}
+        </div>
+      </details>
     </div>
   );
 }

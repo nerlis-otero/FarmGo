@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy: #203b32;
-  --color-bluebonnet: #658879;
-  --color-indigo: #286649;
-  --color-mist: #e4eee6;
-  --color-foam: #f3f7ef;
-  --color-page: #f7f8f2;
-  --color-field: #75a77c;
-  --color-fern: #32774d;
-  --color-straw: #f3e7c7;
-  --color-ok: #a96d22;
-  --color-low: #aa493a;
-  --shadow-soft: 0 14px 40px rgb(32 59 50 / 8%);
+  --color-navy: #1a3329;
+  --color-bluebonnet: #7a9a88;
+  --color-indigo: #2a6b45;
+  --color-mist: #dde8df;
+  --color-foam: #eef3e8;
+  --color-page: #f4f6ef;
+  --color-field: #6fa876;
+  --color-fern: #3a8b55;
+  --color-straw: #f0e2c0;
+  --color-ok: #b07820;
+  --color-low: #a84538;
+  --shadow-soft: 0 14px 40px rgb(26 51 41 / 8%);
 }
 
 @layer components {
@@ -40,14 +40,17 @@
   }
 }
 
-:focus-visible {
-  outline: 3px solid var(--color-indigo);
-  outline-offset: 3px;
-}
+@layer base {
+  :focus-visible {
+    outline: 3px solid var(--color-indigo);
+    outline-offset: 2px;
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
+  details.panel > summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  details.panel > summary::-webkit-details-marker {
+    display: none;
   }
 }

@@ -92,17 +92,34 @@ function loadCropOptions(csv: string): CropOption[] {
 }
 
 export async function GET() {
-  try {
-    const csvPath = path.resolve(process.cwd(), "../data/crops.csv");
-    const csv = await readFile(csvPath, "utf8");
-    return NextResponse.json(loadCropOptions(csv), {
-      headers: { "Cache-Control": "no-store" },
-    });
-  } catch (error) {
-    console.error("Could not load the crop catalog:", error);
-    return NextResponse.json(
-      { error: "The crop catalog could not be loaded. Check that data/crops.csv is available." },
-      { status: 500 },
-    );
+  const candidatePaths = [
+    path.resolve(process.cwd(), "src/data/crops.csv"),
+    path.resolve(process.cwd(), "../data/crops.csv"),
+    path.resolve(process.cwd(), "data/crops.csv"),
+  ];
+
+  let csv: string | null = null;
+  for (const candidate of candidatePaths) {
+    try {
+      csv = await readFile(candidate, "utf8");
+      break;
+    } catch {
+      // try next candidate path
+    }
   }
+
+  if (csv) {
+    try {
+      return NextResponse.json(loadCropOptions(csv), {
+        headers: { "Cache-Control": "no-store" },
+      });
+    } catch (parseError) {
+      console.error("Error parsing crops CSV:", parseError);
+    }
+  }
+
+  return NextResponse.json(
+    { error: "The crop catalog could not be loaded. Check that crops.csv is available." },
+    { status: 500 },
+  );
 }
