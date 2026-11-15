@@ -1,5 +1,8 @@
 """Soil Agent data tools: USDA SSURGO via Soil Data Access (no API key)."""
-import requests
+try:
+    import requests
+except ImportError:
+    import httpx as requests
 
 from shared.cache import cached_json
 

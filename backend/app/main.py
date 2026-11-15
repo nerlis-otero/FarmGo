@@ -13,7 +13,12 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import requests
+try:
+    import requests
+    RequestException = requests.RequestException
+except ImportError:
+    class RequestException(Exception):
+        pass
 
 from app.contracts import (
     PRIORITY_WEIGHTS,
@@ -70,7 +75,7 @@ def recommend(req: RecommendRequest) -> RecommendResponse:
                 req.priority,
                 req.current_crops,
             )
-        except (requests.RequestException, OSError, ValueError) as error:
+        except (RequestException, OSError, ValueError) as error:
             logger.warning(
                 "Could not build a recommendation for coordinates %.4f, %.4f: %s",
                 req.lat,
