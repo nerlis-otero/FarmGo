@@ -1,3 +1,7 @@
+from dotenv import find_dotenv, load_dotenv
+
+load_dotenv(find_dotenv(usecwd=True))  # must run before the imports below
+
 from typing import Literal
 
 from fastapi import FastAPI, HTTPException
@@ -5,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from orchestrator.pipeline import run_pipeline
+from chatbot import router as chat_router
 
 app = FastAPI(title="Cambio de campo - Backend")
 
@@ -14,6 +19,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(chat_router)
 
 
 class RecommendRequest(BaseModel):
