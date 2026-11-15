@@ -38,6 +38,12 @@ FARMS_PATH = ROOT / "data" / "farms.json"
 app = FastAPI(title="FarmGo", version="0.1.0")
 logger = logging.getLogger(__name__)
 
+try:
+    from chatbot import router as chat_router
+    app.include_router(chat_router)
+except Exception as e:
+    logger.warning("Could not mount chatbot router: %s", e)
+
 # Permite que el frontend (Next.js local o en Vercel) llame al API sin bloqueos de CORS.
 app.add_middleware(
     CORSMiddleware,

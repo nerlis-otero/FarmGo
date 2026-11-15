@@ -5,18 +5,21 @@ import time
 import traceback
 from typing import Literal, Optional
 
-from dotenv import find_dotenv, load_dotenv
+try:
+    from dotenv import find_dotenv, load_dotenv
+    load_dotenv(find_dotenv(usecwd=True))
+except ImportError:
+    pass
 from fastapi import APIRouter
 from groq import AsyncGroq, BadRequestError, RateLimitError
 from pydantic import BaseModel
 
 from agents.climate.tools import get_nasa_power
 from chat_market import get_market_history
-
-load_dotenv(find_dotenv(usecwd=True))
+from shared.config import GROQ_API_KEY
 
 router = APIRouter()
-client = AsyncGroq(api_key=os.environ.get("GROQ_API_KEY"))
+client = AsyncGroq(api_key=GROQ_API_KEY or os.environ.get("GROQ_API_KEY"))
 
 
 async def _create(retries: int = 2, **kwargs):
