@@ -39,8 +39,11 @@ export default function FarmMap({ position, onSelect }: Props) {
   // and destroy it when the page is hidden.
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    setVisible(true);
-    return () => setVisible(false);
+    const frame = window.requestAnimationFrame(() => setVisible(true));
+    return () => {
+      window.cancelAnimationFrame(frame);
+      setVisible(false);
+    };
   }, []);
 
   if (!visible) {

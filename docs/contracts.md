@@ -18,6 +18,8 @@ Si necesitas cambiar un formato: avisa al integrante 1 y actualiza **los tres ar
 - **Prioridades (`Priority`):** `Profit`, `Water Saving`, `Soil Health`, `Balanced`
 - **Fincas de ejemplo:** `farm_1`, `farm_2`, `farm_3` (ver `data/farms.json`)
 - **Llave de clima:** `county_fips` (5 dígitos). **Suelo y cultivos:** por punto (lat/lon).
+- **Petición:** `farm_id` o un par de coordenadas válidas `lat`/`lon`, `priority` y, de forma opcional,
+  `current_crops` (cultivos seleccionados del catálogo).
 
 ## Pesos por prioridad (propuesta, ajustar en la reunión)
 
@@ -33,30 +35,28 @@ Si necesitas cambiar un formato: avisa al integrante 1 y actualiza **los tres ar
 ## Flujo y responsables
 
 ```
-POST /recommend  (RecommendRequest)
-   │
-   ├─ get_climate_metrics(lat, lon, county_fips)  -> ClimateMetrics        [integrante 2]
-   ├─ get_soil_rotation_metrics(lat, lon)         -> SoilRotationMetrics   [integrante 3]
-   ├─ get_market_metrics(crop_ids)                -> MarketMetrics         [integrante 4]
-   │
-   ├─ score_rotations(priority, climate, soil, market) -> list[ScoredRotation]   [integrante 3]
-   │        (siempre 3: la actual + 2 sugeridas)
-   │
-   ├─ explain_rotations(priority, rotations)      -> LLMOutput             [integrante 1]
-   │
-   └─ respuesta                                   -> RecommendResponse     [integrante 1]
+POST /recommend (RecommendRequest)
+   ├─ Si recibe lat/lon: obtiene clima de NASA POWER para ese punto y puntúa
+   │  plantillas de data/rotations.csv con perfiles de data/crops.csv.
+   ├─ Usa current_crops como línea base de la rotación actual.
+   ├─ Usa los CSV estatales de NASS disponibles para una señal de mercado.
+   └─ Devuelve siempre la rotación actual y 2 sugeridas (RecommendResponse).
 ```
 
 ## Qué recibe y devuelve cada pieza
 
 | Pieza | Entrada | Salida | Modelo |
 |---|---|---|---|
-| Clima | lat, lon, county_fips | `ClimateMetrics` | POWER + NDVI de MODIS |
-| Suelo y rotación | lat, lon | `SoilRotationMetrics` | SSURGO + CropScape |
-| Mercado | lista de `CropId` | `MarketMetrics` | USDA NASS |
-| Puntuación | prioridad + 3 salidas anteriores | `list[ScoredRotation]` (3) | código con reglas |
-| Explicación | prioridad + `ScoredRotation` | `LLMOutput` | modelo de lenguaje existente |
-| API | `RecommendRequest` | `RecommendResponse` | FastAPI |
+| Clima | lat, lon | Resumen histórico del punto | NASA POWER |
+| Rotación | prioridad + perfiles | 2 plantillas sugeridas | `data/rotations.csv` y `data/crops.csv` |
+| Suelo | características de cultivos | Puntaje potencial de rotación | Reglas de la app; todavía no mide SSURGO en la parcela |
+| Mercado | cultivo | Historial estatal disponible | USDA NASS; no es precio local ni margen |
+| API | `RecommendRequest` (farm_id o lat/lon, prioridad y current_crops) | `RecommendResponse` | FastAPI |
+
+Para una ubicación marcada, NASA POWER usa las coordenadas del mapa. Los puntajes de suelo se basan
+en perfiles preliminares del catálogo, y los de mercado usan archivos NASS estatales cuando existen.
+La demo no debe presentarlos como mediciones de suelo ni precios específicos del condado. Si NASA
+POWER no está disponible, el frontend muestra el mock de Lubbock e indica que no usó las coordenadas.
 
 Los campos exactos de cada modelo están en `backend/app/contracts.py` (los JSON Schema se generan en `docs/schemas/`).
 

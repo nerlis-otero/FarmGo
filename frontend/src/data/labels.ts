@@ -17,8 +17,8 @@ export function rotationName(crops: CropId[]): string {
 
 export const PRIORITIES: { id: Priority; label: string; hint: string }[] = [
   { id: "Water Saving", label: "Save water", hint: "Favor crops that handle dry conditions" },
-  { id: "Profit", label: "Improve profit", hint: "Give market potential more weight" },
-  { id: "Soil Health", label: "Protect soil", hint: "Favor soil health and cover" },
+  { id: "Profit", label: "Improve farm income", hint: "Give market potential more weight" },
+  { id: "Soil Health", label: "Protect the soil", hint: "Favor soil health and ground cover" },
   { id: "Balanced", label: "Balance priorities", hint: "Consider water, soil, and market" },
 ];
 

@@ -1,5 +1,19 @@
 {
   "$defs": {
+    "CropId": {
+      "enum": [
+        "corn",
+        "cotton",
+        "sorghum",
+        "soybean",
+        "wheat",
+        "peanut",
+        "oats_cover",
+        "forage_grass"
+      ],
+      "title": "CropId",
+      "type": "string"
+    },
     "Priority": {
       "enum": [
         "Profit",
@@ -28,6 +42,8 @@
     "lat": {
       "anyOf": [
         {
+          "maximum": 90,
+          "minimum": -90,
           "type": "number"
         },
         {
@@ -40,6 +56,8 @@
     "lon": {
       "anyOf": [
         {
+          "maximum": 180,
+          "minimum": -180,
           "type": "number"
         },
         {
@@ -51,6 +69,13 @@
     },
     "priority": {
       "$ref": "#/$defs/Priority"
+    },
+    "current_crops": {
+      "items": {
+        "$ref": "#/$defs/CropId"
+      },
+      "title": "Current Crops",
+      "type": "array"
     }
   },
   "required": [

@@ -59,14 +59,17 @@ class Farm(BaseModel):
 class RecommendRequest(BaseModel):
     """POST /recommend. Se envía farm_id O (lat y lon)."""
     farm_id: Optional[str] = None
-    lat: Optional[float] = None
-    lon: Optional[float] = None
+    lat: Optional[float] = Field(default=None, ge=-90, le=90)
+    lon: Optional[float] = Field(default=None, ge=-180, le=180)
     priority: Priority
+    current_crops: list[CropId] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _farm_or_point(self):
         if not self.farm_id and (self.lat is None or self.lon is None):
             raise ValueError("Envía farm_id o lat y lon")
+        if (self.lat is None) != (self.lon is None):
+            raise ValueError("Envía lat y lon juntos")
         return self
 
 
