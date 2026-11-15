@@ -1,5 +1,5 @@
 """
-FarmFuture AI - Servicio de Explicación y LLM (Groq / IA Existente).
+FarmGo - Servicio de Explicación y LLM (Groq / IA Existente).
 Responsable: Integrante 1 (Tech Lead) integrado al pipeline del MVP.
 
 Regla de oro:

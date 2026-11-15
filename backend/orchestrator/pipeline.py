@@ -97,29 +97,70 @@ def _fallback_verdict(analyses: dict) -> FarmerVerdict:
     )
 
 
-async def run_pipeline(lat: float, lon: float, priority: str) -> MultiAgentReport:
+async def run_pipeline(
+    lat: float, lon: float, priority: str, current_crops: list[str] | None = None
+) -> MultiAgentReport:
     # Round coordinates to protect the farmer's location privacy.
     lat, lon = round(lat, 2), round(lon, 2)
+    priority_key = _priority_key(priority)
+    current_crops = current_crops or []
 
-    # Round 1: three agents in parallel
-    climate, soil, market = await asyncio.gather(
-        asyncio.to_thread(climate_agent.run, lat, lon, priority),
-        asyncio.to_thread(soil_agent.run, lat, lon, priority),
-        asyncio.to_thread(market_agent.run, lat, lon, priority),
+    results = await asyncio.gather(
+        asyncio.to_thread(climate_agent.run, lat, lon, priority_key),
+        asyncio.to_thread(soil_agent.run, lat, lon, priority_key, current_crops),
+        asyncio.to_thread(market_agent.run, lat, lon, priority_key),
+        return_exceptions=True,
     )
-    analyses = {"climate": climate, "soil": soil, "market": market}
+    names = ("climate", "soil", "market")
+    analyses: dict[str, dict] = {}
+    for name, result in zip(names, results):
+        if isinstance(result, asyncio.CancelledError):
+            raise result
+        if isinstance(result, Exception):
+            logger.error("%s agent failed: %s", name, result)
+            analyses[name] = {"error": f"{name} agent failed"}
+        else:
+            analyses[name] = result
 
-    # Round 2: each agent responds to the others, in parallel
-    discussion = await discuss(analyses, priority)
-
-    # Final verdict
-    verdict = await asyncio.to_thread(judge, analyses, discussion, priority)
-
-    return {"analyses": analyses, "discussion": discussion, "verdict": verdict}
-    final = recommend(climate, soil, market, priority)
+    discussion_results = await discuss(analyses, priority_key)
     try:
-        discussion = await asyncio.to_thread(discuss, climate, soil, market, priority)
-    except Exception:
-        discussion = None  # si falla la discusión, la recomendación igual sale
-    return {"climate": climate, "soil": soil, "market": market, "final": final, "discussion": discussion}
+        verdict_result = await asyncio.to_thread(
+            judge, analyses, discussion_results, priority_key
+        )
+        verdict = FarmerVerdict(
+            best_crop_to_grow=verdict_result.get("bestCropToGrow"),
+            best_crop_to_sell=verdict_result.get("bestCropToSell"),
+            recommended_rotation=verdict_result.get("recommendedRotation"),
+            best_overall_crop=verdict_result.get("bestOverallCrop"),
+            reasoning=verdict_result["reasoning"],
+            confidence=verdict_result["confidence"],
+            things_to_consider=_strings(verdict_result.get("thingsToConsider")),
+            gaps=_strings(verdict_result.get("gaps")),
+            judge_used=True,
+        )
+    except Exception as error:
+        logger.error("Final agent verdict failed: %s", error)
+        verdict = _fallback_verdict(analyses)
+
+    discussions = {
+        name: AgentDiscussionSummary(
+            agreements=_strings(result.get("agrees_with")),
+            disagreements=_strings(result.get("disagreements")),
+            position=result.get("final_position") if isinstance(result.get("final_position"), str) else None,
+            error=(
+                f"The {name} agent could not review the other analyses."
+                if "error" in result
+                else None
+            ),
+        )
+        for name, result in discussion_results.items()
+    }
+
+    return MultiAgentReport(
+        climate=_analysis_summary("climate", analyses["climate"]),
+        soil=_analysis_summary("soil", analyses["soil"]),
+        market=_analysis_summary("market", analyses["market"]),
+        discussion=discussions,
+        verdict=verdict,
+    )
 

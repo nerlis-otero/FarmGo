@@ -1,4 +1,4 @@
-# Registro de Decisiones de FarmFuture AI
+# Registro de Decisiones de FarmGo
 
 Este documento registra los acuerdos técnicos y decisiones de diseño tomadas por el equipo para mantener sincronía sin colisiones.
 

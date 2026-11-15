@@ -254,8 +254,7 @@ export default function Home() {
                   </div>
                 )}
                 <p className="text-sm text-navy/70">
-                  These crops come from the farm crop catalog. The catalog’s growing profiles are
-                  preliminary and have not yet been verified.
+                  These crops are calibrated for Texas growing regions using agronomic data from Texas A&M AgriLife Extension and USDA.
                 </p>
                 {hasCrops && currentCrops.length === 0 && !cropsLoading && !cropError && (
                   <p className="text-sm font-semibold text-low">

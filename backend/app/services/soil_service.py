@@ -1,5 +1,5 @@
 """
-FarmFuture AI - Servicio de Suelo y Rotación Histórica (SSURGO + CropScape).
+FarmGo - Servicio de Suelo y Rotación Histórica (SSURGO + CropScape).
 Responsable: Integrante 3.
 
 Fuentes oficiales:

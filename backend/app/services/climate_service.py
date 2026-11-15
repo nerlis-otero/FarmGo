@@ -1,5 +1,5 @@
 """
-FarmFuture AI - Servicio de Clima (NASA POWER).
+FarmGo - Servicio de Clima (NASA POWER).
 Responsable: Módulo de Clima (Integrante 2) integrado al pipeline del MVP.
 
 Fuente oficial:
