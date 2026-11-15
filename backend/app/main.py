@@ -49,7 +49,10 @@ def farms() -> list[dict]:
     return load_farms()
 
 
-@app.post("/recommend", response_model=RecommendResponse)
+@app.post(
+    "/recommend",
+    responses={404: {"description": "Finca desconocida"}},
+)
 def recommend(req: RecommendRequest) -> RecommendResponse:
     if req.farm_id and req.farm_id not in {f["farm_id"] for f in load_farms()}:
         raise HTTPException(status_code=404, detail=f"Finca desconocida: {req.farm_id}")
