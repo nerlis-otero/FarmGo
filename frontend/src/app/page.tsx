@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import BluebyStage from "@/components/BluebyStage";
 import MapPicker from "@/components/MapPicker";
+import PriorityIcon from "@/components/PriorityIcon";
 import { CROP_NAMES, PRIORITIES } from "@/data/labels";
 import { useCropCatalog } from "@/hooks/useCropCatalog";
 import { isInsideTexas } from "@/lib/texas";
@@ -90,6 +91,8 @@ export default function Home() {
     { id: "priority", label: "Goal" },
   ];
 
+  const stepIndex = steps.findIndex((item) => item.id === step);
+
   return (
     <BluebyStage text={bluebyText} compact>
       <div className="flex flex-col gap-3 rounded-2xl border border-navy/10 bg-white/95 p-4 shadow-soft sm:p-5">
@@ -98,8 +101,12 @@ export default function Home() {
             <li
               key={item.id}
               aria-current={step === item.id ? "step" : undefined}
-              className={`rounded-full px-3 py-1.5 font-bold ${
-                step === item.id ? "bg-indigo text-white" : "bg-mist text-navy/70"
+              className={`rounded-full px-3 py-1.5 font-bold transition-colors ${
+                step === item.id
+                  ? "bg-indigo text-white shadow-[0_0_0_4px_rgb(82_170_233/28%)]"
+                  : index < stepIndex
+                    ? "bg-straw text-navy"
+                    : "bg-mist text-navy/70"
               }`}
             >
               {index + 1} · {item.label}
@@ -141,7 +148,7 @@ export default function Home() {
                   ✓ Marked
                 </p>
               ) : (
-                <p className="text-sm text-navy/65">Tap the map to mark your field</p>
+                <p className="text-sm text-navy/75">Tap the map to mark your field</p>
               )}
               <button
                 type="button"
@@ -300,9 +307,10 @@ export default function Home() {
                     onChange={() => setPriority(option.id)}
                     className="mt-1 h-5 w-5 accent-indigo"
                   />
+                  <PriorityIcon id={option.id} />
                   <span>
                     <span className="block font-bold">{option.label}</span>
-                    <span className="mt-0.5 block text-sm text-navy/65">{option.hint}</span>
+                    <span className="mt-0.5 block text-sm text-navy/75">{option.hint}</span>
                   </span>
                 </label>
               ))}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import BluebyStage from "@/components/BluebyStage";
 import RotationCard from "@/components/RotationCard";
+import ScoreBar from "@/components/ScoreBar";
 import { bluebySummary } from "@/data/blueby";
 import { analyzeCropChoice } from "@/data/cropAnalysis";
 import {
@@ -57,7 +58,7 @@ function Comparison() {
 
   if (loading) {
     return (
-      <p role="status" className="rounded-xl bg-white/90 p-5">
+      <p role="status" className="animate-pulse rounded-2xl bg-white/90 p-5 shadow-soft">
         Preparing your crop plans…
       </p>
     );
@@ -136,7 +137,8 @@ function Comparison() {
       <BluebyStage text={bluebySummary(recommendation)} compact />
 
       {best && bestTitle && bestOverall && (
-        <section className="rounded-2xl border-2 border-fern/50 bg-foam p-4 shadow-soft sm:p-5">
+        <section className="relative overflow-hidden rounded-3xl border-2 border-fern/50 bg-gradient-to-br from-foam via-white to-mist p-4 shadow-soft sm:p-6">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-indigo via-straw to-bluebonnet" />
           <p className="text-sm font-bold uppercase tracking-[0.12em] text-fern">
             Best plan · {priorityLabel(priority)}
           </p>
@@ -144,8 +146,9 @@ function Comparison() {
           <p className="mt-2 flex flex-wrap items-center gap-2 font-bold">
             <span className={`h-3 w-3 rounded-full ${RATING_DOT[bestOverall]}`} aria-hidden="true" />
             {OVERALL_WORDS[bestOverall]}
-            <span className="font-semibold text-navy/55">· {best.scores.total}/100</span>
+            <span className="font-semibold text-navy/70">· {best.scores.total}/100</span>
           </p>
+          <ScoreBar score={best.scores.total} rating={bestOverall} className="mt-3 max-w-md" />
           {cropSuggestion?.crop && (
             <p className="mt-3 rounded-xl bg-white/85 px-3 py-2 font-semibold">
               {hasCrops ? "Crop to add: " : "Start with: "}
@@ -197,13 +200,13 @@ function Comparison() {
 
       {currentRotation && (
         <section className="rounded-xl border border-navy/10 bg-white/90 px-4 py-3">
-          <p className="text-sm font-bold uppercase tracking-[0.12em] text-navy/55">Your crops</p>
+          <p className="text-sm font-bold uppercase tracking-[0.12em] text-navy/70">Your crops</p>
           <p className="mt-1 font-bold">
             {currentRotation.sequence.length > 0
               ? rotationName(currentRotation.sequence)
               : currentRotation.label}
           </p>
-          <p className="mt-1 text-sm text-navy/65">
+          <p className="mt-1 text-sm text-navy/75">
             Baseline for comparison — not a suggested plan.
           </p>
         </section>
@@ -251,7 +254,7 @@ function Comparison() {
               ([label, value]) =>
                 value && (
                   <div key={label} className="rounded-xl bg-white/90 p-3 shadow-xs">
-                    <dt className="text-xs font-bold uppercase tracking-wider text-navy/60">{label}</dt>
+                    <dt className="text-xs font-bold uppercase tracking-wider text-navy/70">{label}</dt>
                     <dd className="mt-0.5 font-bold text-navy">{value}</dd>
                   </div>
                 ),
@@ -271,7 +274,7 @@ function Comparison() {
 
           {recommendation.agent_report.verdict.gaps.length > 0 && (
             <div className="mt-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-navy/60">Missing information</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-navy/70">Missing information</h3>
               <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-navy/70">
                 {recommendation.agent_report.verdict.gaps.map((item) => (
                   <li key={item}>{item}</li>
@@ -367,7 +370,7 @@ function Comparison() {
       <details className="panel rounded-2xl border border-navy/10 bg-mist/80">
         <summary className="flex items-center justify-between gap-3 px-4 py-3 font-bold sm:px-5">
           <span>About the data</span>
-          <span className="text-sm font-semibold text-navy/55">Show details</span>
+          <span className="text-sm font-semibold text-navy/70">Show details</span>
         </summary>
         <div className="border-t border-navy/10 px-4 py-4 text-sm text-navy/80 sm:px-5">
           <p>

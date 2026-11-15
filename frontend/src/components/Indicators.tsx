@@ -1,3 +1,4 @@
+import ScoreBar from "@/components/ScoreBar";
 import { RATING_DOT, RATING_WORDS, rating } from "@/data/labels";
 import type { Rotation } from "@/types/recommendation";
 
@@ -14,11 +15,8 @@ function Indicator({
 }) {
   const r = rating(score);
   return (
-    <li
-      className={`flex items-center justify-between gap-3 rounded-lg bg-foam ${
-        compact ? "px-2.5 py-1.5" : "px-3 py-2"
-      }`}
-    >
+    <li className={`rounded-lg bg-foam ${compact ? "px-2.5 py-1.5" : "px-3 py-2"}`}>
+      <div className="flex items-center justify-between gap-3">
       <div className="min-w-0 flex-1">
         <p className="text-sm font-bold text-navy">{label}</p>
         {!compact && meaning && (
@@ -30,6 +28,8 @@ function Indicator({
         <span className="sr-only">{RATING_WORDS[r]}: </span>
         {score}
       </span>
+      </div>
+      <ScoreBar score={score} rating={r} className="mt-1.5" />
     </li>
   );
 }

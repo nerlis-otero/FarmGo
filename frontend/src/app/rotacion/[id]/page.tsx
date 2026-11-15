@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import BluebyStage from "@/components/BluebyStage";
 import Indicators from "@/components/Indicators";
+import ScoreBar from "@/components/ScoreBar";
 import {
   OVERALL_WORDS,
   RATING_DOT,
@@ -50,7 +51,7 @@ function Detail() {
 
   if (loading) {
     return (
-      <p role="status" className="rounded-xl bg-white/90 p-5">
+      <p role="status" className="animate-pulse rounded-2xl bg-white/90 p-5 shadow-soft">
         Loading plan details…
       </p>
     );
@@ -138,9 +139,10 @@ function Detail() {
         <p className="flex flex-wrap items-center gap-2 font-bold">
           <span className={`h-3 w-3 rounded-full ${RATING_DOT[overall]}`} aria-hidden="true" />
           {OVERALL_WORDS[overall]}
-          <span className="font-semibold text-navy/55">· {rotation.scores.total}/100</span>
-          <span className="font-medium text-navy/55">· {priorityLabel(priority)}</span>
+          <span className="font-semibold text-navy/70">· {rotation.scores.total}/100</span>
+          <span className="font-medium text-navy/70">· {priorityLabel(priority)}</span>
         </p>
+        <ScoreBar score={rotation.scores.total} rating={overall} className="max-w-md" />
         <p className="text-navy/75">{rotation.why}</p>
       </section>
 
@@ -171,7 +173,7 @@ function Detail() {
         <details className="panel rounded-2xl border border-navy/10 bg-white/95 shadow-sm">
           <summary className="flex items-center justify-between gap-3 px-4 py-3 font-bold sm:px-5">
             <span>More detail</span>
-            <span className="text-sm font-semibold text-navy/55">Show</span>
+            <span className="text-sm font-semibold text-navy/70">Show</span>
           </summary>
           <div className="grid gap-3 border-t border-navy/10 p-4 sm:grid-cols-2 sm:p-5">
             {moreSections.map((section) => (
@@ -191,7 +193,7 @@ function Detail() {
       <details className="panel rounded-2xl border border-navy/10 bg-mist/80">
         <summary className="flex items-center justify-between gap-3 px-4 py-3 font-bold sm:px-5">
           <span>About the data</span>
-          <span className="text-sm font-semibold text-navy/55">Show</span>
+          <span className="text-sm font-semibold text-navy/70">Show</span>
         </summary>
         <div className="border-t border-navy/10 px-4 py-4 text-sm text-navy/80 sm:px-5">
           <p>{recommendation.disclaimer}</p>

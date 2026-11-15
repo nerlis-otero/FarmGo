@@ -25,7 +25,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </span>
               <span>FarmGo</span>
             </Link>
-            <p className="hidden text-sm font-medium text-navy/60 sm:block">
+            <p className="hidden items-center gap-2 text-sm font-medium text-navy/70 sm:flex">
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 text-bluebonnet" fill="currentColor">
+                <path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.3L12 17.8 5.7 21.5l1.7-7.3L2 9.5l7.1-.6L12 2z" />
+              </svg>
               Crop plans for Texas farms
             </p>
           </div>

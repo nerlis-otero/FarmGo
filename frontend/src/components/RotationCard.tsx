@@ -15,10 +15,16 @@ export default function RotationCard({ rotation, isBest, href }: Props) {
 
   return (
     <article
-      className={`flex flex-col gap-3 rounded-xl bg-white p-4 ${
+      className={`relative flex flex-col gap-3 overflow-hidden rounded-2xl bg-white p-4 ${
         isBest ? "border-2 border-fern shadow-soft" : "border border-navy/15"
       }`}
     >
+      {isBest && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-indigo via-straw to-bluebonnet"
+        />
+      )}
       <div className="flex flex-wrap items-center gap-2">
         {isBest && (
           <p className="w-fit rounded-full bg-fern px-2.5 py-0.5 text-xs font-bold text-white">
@@ -37,7 +43,7 @@ export default function RotationCard({ rotation, isBest, href }: Props) {
       <p className="flex items-center gap-2 font-bold">
         <span className={`h-3 w-3 rounded-full ${RATING_DOT[overall]}`} aria-hidden="true" />
         {OVERALL_WORDS[overall]}
-        <span className="font-semibold text-navy/55">· {scores.total}</span>
+        <span className="font-semibold text-navy/70">· {scores.total}</span>
       </p>
 
       <div className="border-t border-navy/10 pt-2.5">

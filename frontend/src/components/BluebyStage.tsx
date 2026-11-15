@@ -41,7 +41,7 @@ export default function BluebyStage({ text, children, compact = false }: Props) 
         <div className="shrink-0 pt-1">
           <Blueby talking={!done} />
         </div>
-        <div className="bubble min-w-0 flex-1 rounded-xl border-2 border-navy/80 bg-white/95 p-3 shadow-sm sm:p-4">
+        <div className="bubble min-w-0 flex-1 rounded-2xl border-2 border-bluebonnet/70 bg-white/95 p-3 shadow-soft sm:p-4">
           <p className="mb-1 text-xs font-bold uppercase tracking-wider text-fern">
             Blueby
           </p>

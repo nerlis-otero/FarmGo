@@ -35,8 +35,8 @@
     width: 14px;
     height: 14px;
     background: #feffef;
-    border-left: 2px solid var(--color-navy);
-    border-top: 2px solid var(--color-navy);
+    border-left: 2px solid rgb(82 170 233 / 70%);
+    border-top: 2px solid rgb(82 170 233 / 70%);
     transform: rotate(45deg);
   }
   @media (min-width: 48rem) {
@@ -49,6 +49,11 @@
 }
 
 @layer base {
+  html {
+    font-size: 106.25%; /* 17px: más cómodo de leer al aire libre */
+    scroll-behavior: smooth;
+  }
+
   :focus-visible {
     outline: 3px solid var(--color-bluebonnet);
     outline-offset: 2px;
@@ -109,7 +114,61 @@
 
   /* El contenido entra con un fundido suave */
   main {
-    animation: rise-in 0.6s ease-out both;
+    animation: rise-in 0.6s ease-out backwards;
+  }
+
+
+  /* Las tarjetas de una lista aparecen una tras otra */
+  .grid > article {
+    animation: rise-in 0.5s ease-out backwards;
+  }
+  .grid > article:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+  .grid > article:nth-child(3) {
+    animation-delay: 0.16s;
+  }
+  .grid > article:nth-child(4) {
+    animation-delay: 0.24s;
+  }
+
+  /* Opción elegida: se nota de lejos (útil bajo el sol) */
+  label:has(input:checked) {
+    border-color: var(--color-indigo);
+    background-color: var(--color-foam);
+    box-shadow: 0 0 0 4px rgb(82 170 233 / 22%);
+  }
+  label:has(input:checked) .icon-badge {
+    background-color: var(--color-indigo);
+    color: var(--color-white);
+  }
+
+  /* Botones principales: brillo verde al pasar el cursor */
+  .bg-indigo:not(:disabled):hover {
+    box-shadow: 0 10px 22px rgb(68 112 39 / 30%);
+    transform: translateY(-1px);
+  }
+
+  /* Paneles desplegables: flechita que gira al abrir */
+  details.panel > summary::after {
+    content: "";
+    flex: none;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-left: 0.25rem;
+    border-right: 2.5px solid var(--color-indigo);
+    border-bottom: 2.5px solid var(--color-indigo);
+    transform: rotate(45deg);
+    transition: transform 0.25s ease;
+  }
+  details.panel[open] > summary::after {
+    transform: rotate(-135deg);
+  }
+
+  /* Barra de puntaje: crece al aparecer */
+  .meter-fill {
+    transform-origin: left center;
+    animation: meter 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s backwards;
   }
 
   /* Barra superior con un hilo de color */
@@ -126,6 +185,15 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes meter {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 
@@ -164,7 +232,9 @@
   main,
   .cloud,
   .sun,
-  .hill-sway {
+  .hill-sway,
+  .meter-fill,
+  .grid > article {
     animation: none !important;
   }
   article:hover,

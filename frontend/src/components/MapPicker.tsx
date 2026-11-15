@@ -208,7 +208,7 @@ export default function MapPicker({
 
       <div
         ref={containerRef}
-        style={{ height, width: "100%", borderRadius: 12, overflow: "hidden", zIndex: 0 }}
+        style={{ height, width: "100%", borderRadius: 18, overflow: "hidden", zIndex: 0, border: "3px solid #feffef", boxShadow: "0 12px 30px rgba(68,112,39,.18)" }}
         aria-label="Map to mark your farm location"
       />
 
