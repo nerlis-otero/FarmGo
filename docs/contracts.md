@@ -6,7 +6,7 @@ Si necesitas cambiar un formato: avisa al integrante 1 y actualiza **los tres ar
 
 ## Principios
 
-1. **No hay agentes.** Usamos un modelo de lenguaje existente (vía API) solo para redactar explicaciones.
+1. Los agentes especializados analizan clima, suelo/rotación y mercado; un juez resume sus resultados.
 2. **Los números los calcula el código** (motor de puntuación), nunca el modelo.
 3. **No se inventan datos.** Lo que falte queda en `None`/`null` y se anota en `gaps`.
 4. La humedad del suelo de NASA POWER es **modelada**, no observada por satélite.
@@ -40,8 +40,15 @@ POST /recommend (RecommendRequest)
    │  plantillas de data/rotations.csv con perfiles de data/crops.csv.
    ├─ Usa current_crops como línea base de la rotación actual.
    ├─ Usa los CSV estatales de NASS disponibles para una señal de mercado.
-   └─ Devuelve siempre la rotación actual y 2 sugeridas (RecommendResponse).
+   ├─ Para coordenadas, ejecuta los agentes de clima, suelo y mercado, discusión y juez.
+   └─ Devuelve 3 rotaciones y, para coordenadas, el informe multiagente (RecommendResponse).
 ```
+
+`agent_report` contiene los resúmenes y puntajes de cada agente, sus posiciones y desacuerdos
+en la discusión, y el veredicto final con nivel de confianza, recomendaciones, datos faltantes
+y aspectos que el agricultor debe revisar. Si el juez no está disponible, se presenta un
+veredicto preliminar de confianza baja y se indica explícitamente que faltó su revisión.
+Las fincas de ejemplo guardadas no ejecutan agentes y devuelven `agent_report: null`.
 
 ## Qué recibe y devuelve cada pieza
 

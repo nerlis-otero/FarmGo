@@ -85,6 +85,7 @@ function savedDemo(request: RecommendRequest, reason: string) {
 
   response.farm_id = request.farm_id ?? "custom";
   response.priority = priority;
+  response.agent_report = null;
   const currentRotation = response.rotations.find((rotation) => rotation.is_current);
   if (currentRotation) {
     currentRotation.sequence = request.current_crops ?? [];

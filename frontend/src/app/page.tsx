@@ -133,9 +133,9 @@ export default function Home() {
 
             {locationError && <p role="alert" className="text-base font-semibold text-low">{locationError}</p>}
             <MapPicker
-              position={selected ? [selected.lat, selected.lon] : null}
-              onSelect={(lat, lon) => {
-                setSelected({ farmId: "custom", lat, lon });
+              value={selected ? { lat: selected.lat, lng: selected.lon } : null}
+              onChange={({ lat, lng }) => {
+                setSelected({ farmId: "custom", lat, lon: lng });
                 setLocationError(null);
               }}
             />

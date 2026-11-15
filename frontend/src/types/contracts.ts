@@ -61,6 +61,42 @@ export interface RotationResult {
   risks: string[];
 }
 
+export interface AgentAnalysisSummary {
+  status: "complete" | "unavailable";
+  score: number | null;
+  recommendation: string | null;
+  alternatives: string[];
+  reasons: string[];
+  error: string | null;
+}
+
+export interface AgentDiscussionSummary {
+  agreements: string[];
+  disagreements: string[];
+  position: string | null;
+  error: string | null;
+}
+
+export interface FarmerVerdict {
+  best_crop_to_grow: string | null;
+  best_crop_to_sell: string | null;
+  recommended_rotation: string | null;
+  best_overall_crop: string | null;
+  reasoning: string;
+  confidence: "low" | "medium" | "high";
+  things_to_consider: string[];
+  gaps: string[];
+  judge_used: boolean;
+}
+
+export interface MultiAgentReport {
+  climate: AgentAnalysisSummary;
+  soil: AgentAnalysisSummary;
+  market: AgentAnalysisSummary;
+  discussion: Record<string, AgentDiscussionSummary>;
+  verdict: FarmerVerdict;
+}
+
 export interface RecommendResponse {
   farm_id: string;
   priority: Priority;
@@ -68,6 +104,7 @@ export interface RecommendResponse {
   rotations: [RotationResult, RotationResult, RotationResult]; // siempre 3, una es la actual
   data_notes: string[];
   disclaimer: string;
+  agent_report: MultiAgentReport | null;
 }
 
 export interface Farm {

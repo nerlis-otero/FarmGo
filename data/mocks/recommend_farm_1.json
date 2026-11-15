@@ -45,5 +45,6 @@
     "Values in this file are test data, not measurements from a specific farm.",
     "Live climate, soil, satellite, and local market data are not connected yet."
   ],
-  "disclaimer": "This tool supports farm decisions; it does not replace advice from a local agricultural expert."
+  "disclaimer": "This tool supports farm decisions; it does not replace advice from a local agricultural expert.",
+  "agent_report": null
 }

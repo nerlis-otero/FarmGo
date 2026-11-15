@@ -1,5 +1,118 @@
 {
   "$defs": {
+    "AgentAnalysisSummary": {
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "unavailable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "recommendation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recommendation"
+        },
+        "alternatives": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Alternatives",
+          "type": "array"
+        },
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "AgentAnalysisSummary",
+      "type": "object"
+    },
+    "AgentDiscussionSummary": {
+      "properties": {
+        "agreements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Agreements",
+          "type": "array"
+        },
+        "disagreements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Disagreements",
+          "type": "array"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Position"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        }
+      },
+      "title": "AgentDiscussionSummary",
+      "type": "object"
+    },
     "CropId": {
       "enum": [
         "corn",
@@ -48,6 +161,128 @@
         "total"
       ],
       "title": "DimensionScores",
+      "type": "object"
+    },
+    "FarmerVerdict": {
+      "properties": {
+        "best_crop_to_grow": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best Crop To Grow"
+        },
+        "best_crop_to_sell": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best Crop To Sell"
+        },
+        "recommended_rotation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recommended Rotation"
+        },
+        "best_overall_crop": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best Overall Crop"
+        },
+        "reasoning": {
+          "title": "Reasoning",
+          "type": "string"
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "things_to_consider": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Things To Consider",
+          "type": "array"
+        },
+        "gaps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Gaps",
+          "type": "array"
+        },
+        "judge_used": {
+          "title": "Judge Used",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "reasoning",
+        "confidence",
+        "judge_used"
+      ],
+      "title": "FarmerVerdict",
+      "type": "object"
+    },
+    "MultiAgentReport": {
+      "properties": {
+        "climate": {
+          "$ref": "#/$defs/AgentAnalysisSummary"
+        },
+        "soil": {
+          "$ref": "#/$defs/AgentAnalysisSummary"
+        },
+        "market": {
+          "$ref": "#/$defs/AgentAnalysisSummary"
+        },
+        "discussion": {
+          "additionalProperties": {
+            "$ref": "#/$defs/AgentDiscussionSummary"
+          },
+          "title": "Discussion",
+          "type": "object"
+        },
+        "verdict": {
+          "$ref": "#/$defs/FarmerVerdict"
+        }
+      },
+      "required": [
+        "climate",
+        "soil",
+        "market",
+        "discussion",
+        "verdict"
+      ],
+      "title": "MultiAgentReport",
       "type": "object"
     },
     "Priority": {
@@ -164,6 +399,17 @@
     "disclaimer": {
       "title": "Disclaimer",
       "type": "string"
+    },
+    "agent_report": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MultiAgentReport"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     }
   },
   "required": [
