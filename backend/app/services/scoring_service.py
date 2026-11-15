@@ -1,5 +1,5 @@
 """
-FarmFuture AI - Motor de Puntuación de Rotaciones (Scoring Engine).
+FarmGo - Motor de Puntuación de Rotaciones (Scoring Engine).
 Responsable: Integrante 3.
 
 Reglas del sistema:

@@ -1,6 +1,6 @@
 ﻿id,aplica_a,tipo,descripcion,fuente,estado_fuente
 L01,todos,limitacion_datos,"Los rendimientos y precios son promedios de todo Texas, no de tu finca ni de tu condado.",Archivos NASS QuickStats descargados (nivel STATE),verificada
-L02,todos,limitacion_datos,"Los precios no incluyen los costos de producción, así que el margen de ganancia es solo una estimación.","README de FarmFuture AI, sección Limitaciones",verificada
+L02,todos,limitacion_datos,"Los precios no incluyen los costos de producción, así que el margen de ganancia es solo una estimación.","README de FarmGo, sección Limitaciones",verificada
 L03,todos,limitacion_datos,"El precio de cada cultivo viene en una unidad distinta (bushel, libra, quintal) y no se puede comparar directamente sin convertirlo.","Archivos NASS, columna unit_desc",verificada
 L04,todos,limitacion_datos,Los promedios usan los años 2020 a 2025; el 2026 se dejó fuera porque el año no ha terminado.,"Archivos NASS, columna reference_period_desc (pronósticos 2026)",verificada
 L05,todos,limitacion_datos,El rendimiento mezcla fincas con riego y sin riego (todas las prácticas de producción).,"Archivos NASS, columna prodn_practice_desc = ALL PRODUCTION PRACTICES",verificada

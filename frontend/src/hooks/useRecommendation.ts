@@ -72,7 +72,9 @@ export function useRecommendation(
           return;
         }
         const recommendation = (await response.json()) as RecommendResponse;
-        const source = response.headers.get("x-farmfuture-data-source");
+        const source =
+          response.headers.get("x-farmgo-data-source") ??
+          response.headers.get("x-farmfuture-data-source");
         setState({
           requestKey,
           recommendation,

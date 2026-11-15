@@ -1,5 +1,5 @@
 # Reglas Agronómicas de Rotación y Salud del Suelo
-**FarmFuture AI · NASA Space Apps Challenge 2026 · Reto Field Shift**
+**FarmGo · NASA Space Apps Challenge 2026 · Reto Field Shift**
 *Responsable: Integrante 3 (Suelo, Rotaciones y Motor de Puntuación)*
 
 Este documento establece las reglas agronómicas basadas en ciencia del suelo y manejo de cultivos para Texas (referencias: Texas A&M AgriLife Extension, USDA-NRCS Soil Health Division y FAO EcoCrop). Estas reglas son la base del motor de puntuación en código y proveen los hechos comprobables (`facts`) y reglas aplicadas (`rules_applied`) que el modelo de lenguaje utiliza para redactar las explicaciones sin inventar datos.

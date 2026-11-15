@@ -1,5 +1,5 @@
 """
-FarmFuture AI: contratos de datos (fuente de verdad en código).
+FarmGo: contratos de datos (fuente de verdad en código).
 
 Reglas:
 - Todos los módulos reciben y devuelven EXACTAMENTE estos modelos.

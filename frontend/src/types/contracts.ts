@@ -1,5 +1,5 @@
 /**
- * FarmFuture AI data contracts (mirrored from backend/app/contracts.py).
+ * FarmGo data contracts (mirrored from backend/app/contracts.py).
  * Keep the backend contract and docs/contracts.md in sync when changing these types.
  */
 

@@ -1,4 +1,4 @@
-# Contratos de FarmFuture AI
+# Contratos de FarmGo
 
 Todo el equipo trabaja contra este documento. La **fuente de verdad en código** es
 `backend/app/contracts.py`; `frontend/src/types/contracts.ts` es su espejo.

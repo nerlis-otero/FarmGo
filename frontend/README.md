@@ -1,4 +1,4 @@
-# FarmFuture AI frontend
+# FarmGo frontend
 
 An English-language interface for comparing crop rotations on Texas farms. The app uses the
 `POST /recommend` backend endpoint and follows the current recommendation contract. A marked
@@ -29,7 +29,7 @@ Soil scores use draft crop-rotation traits, not measurements from the selected f
 use Texas-wide USDA NASS data where available and do not include production costs. If NASA POWER is
 unavailable, the app clearly falls back to saved Lubbock examples. Crop profiles are still a draft,
 so results are not farm-specific agronomic advice. The Next.js server proxies API requests, so the
-browser does not need direct access to the backend. Set `FARMFUTURE_API_URL` if the backend is
+browser does not need direct access to the backend. Set `FARMGO_API_URL` if the backend is
 running at a different address; the default is `http://127.0.0.1:8000`.
 
 ## Validation

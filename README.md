@@ -1,4 +1,4 @@
-# FarmFuture AI
+# FarmGo
 
 > **NASA Earth Observations & Multi-Agent Intelligence for Resilient Crop Rotation & Soil Health**  
 > Developed for the **NASA Space Apps Challenge 2026** · Challenge: *"Field Shift: Adapting Farms with NASA Data"*
@@ -9,7 +9,7 @@
 
 Farmers worldwide face shifting temperatures, irregular rainfall, extreme heat, and degrading soil health. Choosing the right crop rotation is critical to conserve water, restore nutrients, interrupt pest cycles, and ensure long-term farm resilience.
 
-**FarmFuture AI** is a decision-support platform designed for farmers, agronomists, and agricultural extension services. By combining **NASA Earth observations**, **USDA soil databases**, **NASS market economics**, and a collaborative **Multi-Agent AI Debate Pipeline (powered by Groq)**, FarmFuture AI evaluates multi-year rotation scenarios tailored to farmer priorities:
+**FarmGo** is a decision-support platform designed for farmers, agronomists, and agricultural extension services. By combining **NASA Earth observations**, **USDA soil databases**, **NASS market economics**, and a collaborative **Multi-Agent AI Debate Pipeline (powered by Groq)**, FarmGo evaluates multi-year rotation scenarios tailored to farmer priorities:
 
 - **Water Saving** — Optimizes drought-hardy crops, reduces seasonal irrigation demand.
 - **Soil Health** — Prioritizes legume nitrogen fixation, organic matter enhancement, and erosion control.
@@ -68,7 +68,7 @@ Farmers worldwide face shifting temperatures, irregular rainfall, extreme heat, 
 
 ##  NASA & Scientific Data Integration
 
-| Dataset / Source | Parameters & Variables | Application in FarmFuture AI |
+| Dataset / Source | Parameters & Variables | Application in FarmGo |
 |---|---|---|
 | **NASA POWER** *(Agroclimatology)* | `T2M`, `T2M_MAX`, `T2M_MIN`, `PRECTOTCORR`, `GWETROOT`, `ALLSKY_SFC_SW_DWN` | Temperature trends, extreme heat events, seasonal rainfall, and root-zone soil moisture indicators. |
 | **USDA SSURGO SDA** *(Soil Data Access)* | Soil texture, drainage class, slope %, organic matter %, erodibility factor $K$ | Assesses compaction risk, infiltration capacity, erosion vulnerability, and nutrient holding capacity. |
@@ -79,7 +79,7 @@ Farmers worldwide face shifting temperatures, irregular rainfall, extreme heat, 
 
 ## Multi-Agent AI Pipeline
 
-FarmFuture AI goes beyond static statistical scoring by deploying an autonomous multi-agent consultation system:
+FarmGo goes beyond static statistical scoring by deploying an autonomous multi-agent consultation system:
 
 1. **Climate Specialist Agent:** Analyzes agroclimatic conditions using NASA POWER satellite observations, penalizing water-demanding crops during projected deficit months.
 2. **Soil & Rotation Specialist Agent:** Considers the farmer's current crop baseline, organic matter replenishment, and legume-cereal rotation sequences to break pest cycles.
@@ -150,7 +150,7 @@ Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
 ##  Limitations & Responsible AI Notice
 
-- **Decision-Support Tool:** FarmFuture AI is designed as a supportive decision tool, **not** a replacement for on-the-ground farmer judgment, soil sample laboratory testing, or local agricultural extension expertise.
+- **Decision-Support Tool:** FarmGo is designed as a supportive decision tool, **not** a replacement for on-the-ground farmer judgment, soil sample laboratory testing, or local agricultural extension expertise.
 - **Satellite & Model Resolution:** Satellite products (such as NASA POWER root-zone soil moisture models) represent regional approximations (0.5° grid cells) and may differ from localized micro-topography.
 - **Market Dynamics:** Prices and yields are based on regional USDA NASS state-level baselines; localized contract pricing and direct input costs (fertilizer, seed, diesel) should be verified locally.
 

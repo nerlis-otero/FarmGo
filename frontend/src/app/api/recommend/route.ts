@@ -138,6 +138,7 @@ export async function POST(request: Request) {
   const validatedRequest = validation.request;
 
   const backendUrl = (
+    process.env.FARMGO_API_URL ??
     process.env.FARMFUTURE_API_URL ??
     process.env.NEXT_PUBLIC_API_URL ??
     "http://127.0.0.1:8000"
@@ -163,7 +164,7 @@ export async function POST(request: Request) {
             validatedRequest,
             `${detail} Saved Lubbock demo results are shown instead; they do not use the marked coordinates.`,
           ),
-          { headers: { "x-farmfuture-data-source": "saved-demo" } },
+          { headers: { "x-farmgo-data-source": "saved-demo", "x-farmfuture-data-source": "saved-demo" } },
         );
       }
       return NextResponse.json(body, { status: upstream.status });
@@ -171,7 +172,7 @@ export async function POST(request: Request) {
 
     const recommendation = (await upstream.json()) as RecommendResponse;
     return NextResponse.json(recommendation, {
-      headers: { "x-farmfuture-data-source": "backend" },
+      headers: { "x-farmgo-data-source": "backend", "x-farmfuture-data-source": "backend" },
     });
   } catch (error) {
     if (!(error instanceof TypeError)) {
@@ -187,7 +188,7 @@ export async function POST(request: Request) {
         "The recommendation API is unavailable. Saved Lubbock example results are shown instead.",
       ),
       {
-      headers: { "x-farmfuture-data-source": "saved-demo" },
+      headers: { "x-farmgo-data-source": "saved-demo", "x-farmfuture-data-source": "saved-demo" },
       },
     );
   }
