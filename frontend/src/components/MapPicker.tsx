@@ -24,7 +24,7 @@ type Props = {
 
 const DEFAULT_CENTER: [number, number] = [31.5, -99.5]; // Texas
 const DEFAULT_ZOOM = 6;
-const MARKER_COLOR = "#2a6b45";
+const MARKER_COLOR = "#447027";
 const round = (n: number) => Math.round(n * 1e5) / 1e5; // ~1 m de precisión
 
 export default function MapPicker({
@@ -59,7 +59,7 @@ export default function MapPicker({
       // divIcon: evita el bug clásico de Next.js donde no cargan las imágenes del pin por defecto
       const icon = L.divIcon({
         className: "",
-        html: `<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:${MARKER_COLOR};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);transform:rotate(-45deg)"></div>`,
+        html: `<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:${MARKER_COLOR};border:3px solid #feffef;box-shadow:0 2px 6px rgba(36,61,23,.4);transform:rotate(-45deg)"></div>`,
         iconSize: [28, 28],
         iconAnchor: [14, 28],
       });

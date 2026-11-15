@@ -1,18 +1,26 @@
 @import "tailwindcss";
 
+/*
+  Paleta FarmGo
+  IVORY          #FEFFEF  fondo y tarjetas
+  NOBEL SKY BLUE #52AAE9  acentos fríos, cielo, mapa
+  DUSTY LEMON    #E1EA7B  acentos cálidos, sol, avisos
+  MUSHROOM GREEN #447027  color principal (botones, énfasis)
+*/
 @theme {
-  --color-navy: #1a3329;
-  --color-bluebonnet: #7a9a88;
-  --color-indigo: #2a6b45;
-  --color-mist: #dde8df;
-  --color-foam: #eef3e8;
-  --color-page: #f4f6ef;
-  --color-field: #6fa876;
-  --color-fern: #3a8b55;
-  --color-straw: #f0e2c0;
-  --color-ok: #b07820;
-  --color-low: #a84538;
-  --shadow-soft: 0 14px 40px rgb(26 51 41 / 8%);
+  --color-white: #feffef;
+  --color-page: #feffef;
+  --color-navy: #243d17; /* verde mushroom muy oscuro: solo para texto legible */
+  --color-indigo: #447027; /* MUSHROOM GREEN: botones y foco */
+  --color-fern: #5b8f36; /* tono más claro del mushroom: "mejor opción" y puntos buenos */
+  --color-field: #8fbf62;
+  --color-bluebonnet: #52aae9; /* NOBEL SKY BLUE */
+  --color-mist: #dcedfb; /* sky muy suave: fondos de etiquetas y hover */
+  --color-foam: #f4f8d3; /* lemon muy suave: filas y selección */
+  --color-straw: #e1ea7b; /* DUSTY LEMON: avisos y sol */
+  --color-ok: #c4a82a;
+  --color-low: #c0523f;
+  --shadow-soft: 0 16px 44px rgb(68 112 39 / 12%);
 }
 
 @layer components {
@@ -26,7 +34,7 @@
     left: 26px;
     width: 14px;
     height: 14px;
-    background: #fff;
+    background: #feffef;
     border-left: 2px solid var(--color-navy);
     border-top: 2px solid var(--color-navy);
     transform: rotate(45deg);
@@ -42,8 +50,13 @@
 
 @layer base {
   :focus-visible {
-    outline: 3px solid var(--color-indigo);
+    outline: 3px solid var(--color-bluebonnet);
     outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-straw);
+    color: var(--color-navy);
   }
 
   details.panel > summary {
@@ -52,5 +65,110 @@
   }
   details.panel > summary::-webkit-details-marker {
     display: none;
+  }
+
+  /* Tarjetas: suben un poquito al pasar el cursor */
+  article,
+  details.panel {
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
+  }
+  article:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px rgb(68 112 39 / 14%);
+  }
+
+  /* Opciones seleccionables (radio / checkbox): respuesta suave */
+  label {
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  label:has(input:not(:disabled)):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgb(82 170 233 / 18%);
+  }
+
+  /* Botones y enlaces: transición de color más agradable (sin cambiar su forma) */
+  button,
+  a {
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+  button:not(:disabled):active {
+    transform: scale(0.98);
+  }
+
+  /* El contenido entra con un fundido suave */
+  main {
+    animation: rise-in 0.6s ease-out both;
+  }
+
+  /* Barra superior con un hilo de color */
+  header {
+    box-shadow: 0 1px 0 rgb(82 170 233 / 25%);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-12vw);
+  }
+  to {
+    transform: translateX(112vw);
+  }
+}
+
+@keyframes sun-glow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main,
+  .cloud,
+  .sun,
+  .hill-sway {
+    animation: none !important;
+  }
+  article:hover,
+  label:has(input:not(:disabled)):hover {
+    transform: none;
   }
 }

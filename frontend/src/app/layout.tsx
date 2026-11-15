@@ -17,10 +17,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${body.className} relative flex min-h-screen flex-col bg-page text-base text-navy antialiased`}
       >
         <FieldBackground />
-        <header className="relative z-10 border-b border-navy/10 bg-white/80 px-4 py-3 backdrop-blur-md">
+        <header className="relative z-10 border-b border-navy/10 bg-white/70 px-4 py-3 backdrop-blur-md">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-3 text-xl font-bold text-navy">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-fern text-lg text-white">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo to-bluebonnet text-lg text-white shadow-sm">
                 F
               </span>
               <span>FarmGo</span>
