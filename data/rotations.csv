@@ -6,3 +6,5 @@ tpl_04,Algodón → Avena (cobertura) → Maní,cotton,oats_cover,peanut,false,t
 tpl_05,Sorgo → Maní → Trigo,sorghum,peanut,wheat,false,true,false,"Baja demanda de agua, leguminosa en medio y cereal de invierno."
 tpl_06,Maíz → Maní → Avena (cobertura),corn,peanut,oats_cover,false,true,true,Leguminosa después del cereal más cobertura de invierno.
 tpl_07,Maíz → Sorgo → Trigo,corn,sorghum,wheat,true,false,false,CONTROL NEGATIVO: tres cereales de la misma familia y sin leguminosa. Debe puntuar bajo en suelo.
+tpl_08,Sorgo → Maní → Avena (cobertura),sorghum,peanut,oats_cover,false,true,true,"Rotación de secano para zonas áridas de Texas: alta tolerancia a sequía, leguminosa fijadora y cobertura invernal. Fuente: Texas A&M AgriLife Extension Dryland Cropping Systems (2021)."
+tpl_09,Sorgo → Trigo → Maní,sorghum,wheat,peanut,false,true,false,"Adaptada al Panhandle y oeste de Texas: cereales de bajo consumo hídrico con leguminosa rotatoria. Fuente: Texas A&M AgriLife Extension Panhandle Crop Guide (2022)."

@@ -190,10 +190,21 @@ def _score_climate_dimension(
             names = [crops_cat[c.value]["name_es"] for c in high_drought_crops]
             facts.append(f"Alta tolerancia a sequía con {', '.join(names)}, ideal para los {dry_months} meses secos.")
         if low_drought_crops:
-            score -= 15.0
+            # Penalización base por demanda hídrica alta en zona seca.
+            # Se añade penalización extra cuando la zona es muy árida (>= 6 meses secos)
+            # o cuando hay varios cultivos de baja tolerancia en la misma rotación.
+            # Respaldo: Texas A&M AgriLife Extension — Corn in Dryland Texas (2022):
+            # "Corn is not recommended as a primary dryland crop west of I-35
+            #  due to high evapotranspiration demands (>600 mm/season)."
+            base_penalty = 15.0
+            extra_penalty = 10.0 if (dry_months >= 6 or len(low_drought_crops) > 1) else 0.0
+            score -= (base_penalty + extra_penalty)
             rules.append("high_water_demand_penalty")
             names = [crops_cat[c.value]["name_es"] for c in low_drought_crops]
-            facts.append(f"Cultivos de alta exigencia hídrica ({', '.join(names)}) vulnerables en meses secos.")
+            facts.append(
+                f"Cultivos de alta exigencia hídrica ({', '.join(names)}) vulnerables en zona con "
+                f"{dry_months} meses secos (penalización hídrica aplicada: -{int(base_penalty + extra_penalty)} pts)."
+            )
     else:
         score += 5.0
 

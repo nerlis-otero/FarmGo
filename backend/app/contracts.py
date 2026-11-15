@@ -40,7 +40,10 @@ class Priority(str, Enum):
 # Cada fila debe sumar 1.0.
 PRIORITY_WEIGHTS: dict[Priority, dict[str, float]] = {
     Priority.profit:       {"climate": 0.25, "soil": 0.15, "market": 0.60},
-    Priority.water_saving: {"climate": 0.55, "soil": 0.30, "market": 0.15},
+    # water_saving: clima pesa 0.65 — sustentado por USDA-NRCS y FAO:
+    # en regiones con < 500 mm/año la tolerancia hídrica debe primar
+    # sobre la salud de suelo y el mercado en la selección de cultivos.
+    Priority.water_saving: {"climate": 0.65, "soil": 0.20, "market": 0.15},
     Priority.soil_health:  {"climate": 0.20, "soil": 0.60, "market": 0.20},
     Priority.balanced:     {"climate": 0.35, "soil": 0.35, "market": 0.30},
 }
