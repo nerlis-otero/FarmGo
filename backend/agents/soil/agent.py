@@ -32,32 +32,60 @@ def _safe(fn, *args) -> dict:
 
 
 def _soil_fallback(data: dict, priority: str, current_crops: list[str] | None = None) -> dict:
-    ssurgo = data.get("ssurgo", {})
-    horizons = ssurgo.get("horizons", {}) if isinstance(ssurgo, dict) else {}
-    om = horizons.get("om_r", 1.8) if isinstance(horizons, dict) else 1.8
-    ph = horizons.get("ph1to1h2o_r", 7.2) if isinstance(horizons, dict) else 7.2
-    clay = horizons.get("claytotal_r", 28.0) if isinstance(horizons, dict) else 28.0
+    ssurgo = data.get("ssurgo", {}) if isinstance(data, dict) else {}
+    horizons = ssurgo.get("dominant_component_horizons", []) if isinstance(ssurgo, dict) else []
+    top_hz = horizons[0] if isinstance(horizons, list) and horizons else {}
+    
+    om = top_hz.get("organic_matter_pct") or top_hz.get("organic_matter_percent") or 1.8
+    ph = top_hz.get("ph") or 7.2
+    clay = top_hz.get("clay_pct") or top_hz.get("clay_percent") or 28.0
+    sand = top_hz.get("sand_pct") or top_hz.get("sand_percent") or 45.0
+    
+    map_unit = ssurgo.get("map_unit", {}).get("name") if isinstance(ssurgo.get("map_unit"), dict) else None
+    components = ssurgo.get("components", []) if isinstance(ssurgo, dict) else []
+    drainage = components[0].get("drainage") if components and isinstance(components[0], dict) else None
 
     p = priority.lower().replace(" ", "_")
     curr_lower = [c.lower() for c in current_crops] if current_crops else []
+    
     if "corn" in curr_lower:
         rot = "Corn → Soybean → Wheat"
+        context_reason = "Following your current corn crop with soybean provides biological nitrogen fixation, breaking pest cycles before winter wheat."
     elif "cotton" in curr_lower:
         rot = "Cotton → Oats cover crop → Sorghum"
+        context_reason = "Following your cotton field with an oats cover crop replenishes depleted residue and protects topsoil against winter erosion."
+    elif "sorghum" in curr_lower:
+        rot = "Sorghum → Peanut → Oats cover crop"
+        context_reason = "Rotating from your current sorghum into a legume like peanut utilizes subsoil moisture while diversifying root depth."
+    elif "wheat" in curr_lower:
+        rot = "Wheat → Sorghum → Soybean"
+        context_reason = "Rotating after your winter wheat with sorghum conserves root channels and reduces summer weed pressure."
+    elif "peanut" in curr_lower:
+        rot = "Peanut → Cotton → Oats cover crop"
+        context_reason = "Alternating from peanut to cotton restores soil aggregate structure following harvest digging operations."
     elif "water" in p:
         rot = "Sorghum → Oats cover crop → Cotton"
+        context_reason = "Combines high water-use efficiency taproots with protective winter residue to maximize soil moisture retention."
     elif "soil" in p:
         rot = "Soybean → Sorghum → Oats cover crop"
+        context_reason = "Maximizes biomass and nitrogen fixation to restore depleted soil microbiology and enhance water infiltration."
     else:
         rot = "Sorghum → Peanut → Oats cover crop"
+        context_reason = "Balances nutrient cycling and root biomass accumulation across seasonal cycles."
+
+    soil_id_line = (
+        f"USDA SSURGO soil map unit: '{map_unit}' ({drainage or 'well drained'}), with {clay:.0f}% clay, {sand:.0f}% sand, and pH {ph:.1f}."
+        if map_unit
+        else f"Regional soil survey indicates ~{clay:.0f}% clay with pH {ph:.1f}, favoring structured taproot systems."
+    )
 
     return {
         "recommendedRotation": rot,
         "soilScore": 86,
         "reasons": [
-            f"Regional soil profile indicates clay content of ~{clay:.0f}% with pH {ph:.1f}, favoring deep-rooting rotation systems.",
-            f"Estimated surface organic matter of ~{om:.1f}% benefits from incorporating nitrogen-fixing legumes and cereal residue.",
-            "Rotation breaks monoculture pest cycles and interrupts root disease pathways across seasons.",
+            soil_id_line,
+            f"Surface organic matter is estimated at {om:.1f}%, benefiting directly from cover crop residue and legume nitrogen fixation.",
+            context_reason,
         ],
     }
 

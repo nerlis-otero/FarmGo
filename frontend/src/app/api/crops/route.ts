@@ -93,15 +93,15 @@ function loadCropOptions(csv: string): CropOption[] {
 
 export async function GET() {
   const candidatePaths = [
-    path.resolve(process.cwd(), "src/data/crops.csv"),
-    path.resolve(process.cwd(), "../data/crops.csv"),
-    path.resolve(process.cwd(), "data/crops.csv"),
+    path.join(process.cwd(), "src", "data", "crops.csv"),
+    path.join(process.cwd(), "..", "data", "crops.csv"),
+    path.join(process.cwd(), "data", "crops.csv"),
   ];
 
   let csv: string | null = null;
   for (const candidate of candidatePaths) {
     try {
-      csv = await readFile(candidate, "utf8");
+      csv = await readFile(/*turbopackIgnore: true*/ candidate, "utf8");
       break;
     } catch {
       // try next candidate path

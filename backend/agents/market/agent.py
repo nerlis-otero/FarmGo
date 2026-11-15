@@ -66,8 +66,14 @@ def run(_lat: float, _lon: float, priority: str) -> dict:
     else:
         priority_context = "Selected for balanced gross margin, price stability, and risk management."
 
+    crop_name = best.value.replace("_", " ").title()
+    if best == CropId.peanut:
+        crop_name = "Peanuts"
+    elif best == CropId.oats_cover:
+        crop_name = "Cover crop oats"
+
     return {
-        "bestMarketCrop": best.value,
+        "bestMarketCrop": crop_name,
         "marketScore": score,
         "reasons": [
             f"Estimated gross revenue: ${info.revenue_per_acre} USD/acre (2020-2025 avg yield at 2025 prices)",

@@ -100,6 +100,28 @@ function Comparison() {
         ? "Live climate for your pin"
         : "Sample farm data";
 
+  const formatCropText = (val: string | null | undefined) => {
+    if (!val) return "";
+    const clean = val.trim();
+    const lower = clean.toLowerCase();
+    if (CROP_NAMES[lower]) return CROP_NAMES[lower];
+    return clean.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
+  const suggestedRotationValue =
+    bestTitle &&
+    (!recommendation?.agent_report?.verdict?.recommended_rotation ||
+      recommendation.agent_report.verdict.recommended_rotation.toLowerCase().startsWith("suggested rotation"))
+      ? bestTitle
+      : recommendation?.agent_report?.verdict?.recommended_rotation || bestTitle;
+
+  const displayReasoning = recommendation?.agent_report?.verdict?.reasoning
+    ? recommendation.agent_report.verdict.reasoning.replace(
+        /Suggested rotation \d+/gi,
+        bestTitle || "recommended rotation",
+      )
+    : "";
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -217,14 +239,14 @@ function Comparison() {
           <h2 id="agent-verdict-heading" className="mt-1 text-2xl font-bold">
             What the specialists recommend
           </h2>
-          <p className="mt-2 text-navy/85">{recommendation.agent_report.verdict.reasoning}</p>
+          <p className="mt-2 text-navy/85">{displayReasoning}</p>
 
           <dl className="mt-4 grid gap-2.5 sm:grid-cols-2">
             {[
-              ["Best to grow", recommendation.agent_report.verdict.best_crop_to_grow],
-              ["Best to sell", recommendation.agent_report.verdict.best_crop_to_sell],
-              ["Suggested rotation", recommendation.agent_report.verdict.recommended_rotation],
-              ["Best overall", recommendation.agent_report.verdict.best_overall_crop],
+              ["Best to grow", formatCropText(recommendation.agent_report.verdict.best_crop_to_grow)],
+              ["Best to sell", formatCropText(recommendation.agent_report.verdict.best_crop_to_sell)],
+              ["Suggested rotation", suggestedRotationValue],
+              ["Best overall", formatCropText(recommendation.agent_report.verdict.best_overall_crop)],
             ].map(
               ([label, value]) =>
                 value && (

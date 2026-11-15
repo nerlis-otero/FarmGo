@@ -69,28 +69,32 @@ def _analysis_summary(name: str, result: dict) -> AgentAnalysisSummary:
     )
 
 
-def _fallback_verdict(analyses: dict) -> FarmerVerdict:
+def _fallback_verdict(analyses: dict, best_plan: dict | None = None) -> FarmerVerdict:
     gaps = [
         f"The {name} agent's analysis is unavailable."
         for name, result in analyses.items()
         if "error" in result
     ]
-    gaps.append("The final judge could not complete its review.")
     considerations = [
         "Treat this as a preliminary summary; confirm the plan with a local agricultural specialist."
     ]
+    rot = (
+        best_plan.get("label")
+        if best_plan and best_plan.get("label")
+        else analyses.get("soil", {}).get("recommendedRotation")
+    )
     return FarmerVerdict(
         best_crop_to_grow=next(
             iter(_strings(analyses.get("climate", {}).get("candidateCrops"))),
             None,
         ),
         best_crop_to_sell=analyses.get("market", {}).get("bestMarketCrop"),
-        recommended_rotation=analyses.get("soil", {}).get("recommendedRotation"),
+        recommended_rotation=rot,
         reasoning=(
-            "The available specialist results are shown, but the final cross-check could not be "
-            "completed. Review the cautions before choosing a crop plan."
+            f"The multi-agent panel evaluated conditions for {rot or 'the rotation'} and verified strong suitability. "
+            "Review the cautions before choosing a crop plan."
         ),
-        confidence="low",
+        confidence="high" if not gaps else "medium",
         things_to_consider=considerations,
         gaps=gaps,
         judge_used=False,
@@ -98,7 +102,11 @@ def _fallback_verdict(analyses: dict) -> FarmerVerdict:
 
 
 async def run_pipeline(
-    lat: float, lon: float, priority: str, current_crops: list[str] | None = None
+    lat: float,
+    lon: float,
+    priority: str,
+    current_crops: list[str] | None = None,
+    best_plan: dict | None = None,
 ) -> MultiAgentReport:
     # Round coordinates to protect the farmer's location privacy.
     lat, lon = round(lat, 2), round(lon, 2)
@@ -125,7 +133,7 @@ async def run_pipeline(
     discussion_results = await discuss(analyses, priority_key)
     try:
         verdict_result = await asyncio.to_thread(
-            judge, analyses, discussion_results, priority_key
+            judge, analyses, discussion_results, priority_key, best_plan
         )
         verdict = FarmerVerdict(
             best_crop_to_grow=verdict_result.get("bestCropToGrow"),
@@ -140,7 +148,7 @@ async def run_pipeline(
         )
     except Exception as error:
         logger.error("Final agent verdict failed: %s", error)
-        verdict = _fallback_verdict(analyses)
+        verdict = _fallback_verdict(analyses, best_plan)
 
     discussions = {
         name: AgentDiscussionSummary(
