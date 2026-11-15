@@ -2,7 +2,10 @@
 from collections import defaultdict
 from datetime import date
 
-import requests
+try:
+    import requests
+except ImportError:
+    import httpx as requests
 
 from shared.cache import cached_json
 
