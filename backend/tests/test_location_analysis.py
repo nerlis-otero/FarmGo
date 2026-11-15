@@ -32,3 +32,14 @@ def test_marked_coordinates_change_climate_scores_and_are_reported():
     assert dry.rotations[1].scores.climate != wet.rotations[1].scores.climate
     assert any("33.5000, -101.8000" in note for note in dry.data_notes)
     assert len(dry.rotations) == 3
+
+
+def test_nass_numbers_with_thousands_separator_are_parsed():
+    # Maní: NASS publica "2,490" LB/ACRE; antes se descartaba y el puntaje usaba solo el precio.
+    from app.location_analysis import _market_crop_score, _number  # noqa: E402
+
+    assert _number("2,490") == 2490.0
+    assert _number(" (D)") is None  # dato no publicado
+    score, trend = _market_crop_score(CropId.peanut)
+    assert 0 <= score <= 100 and trend in {"rising", "falling", "fairly steady"}
+    assert score != 65.8  # 65.8 = puntaje con solo el precio (rendimiento ignorado)

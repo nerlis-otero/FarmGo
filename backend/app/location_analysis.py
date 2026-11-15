@@ -22,6 +22,10 @@ MARKET_DATA = {
     CropId.corn: ("nass_corn_tx_price.csv", "nass_corn_tx_yield.csv"),
     CropId.cotton: ("nass_cotton_tx_price.csv", "nass_cotton_tx_yield.csv"),
     CropId.sorghum: ("nass_sorghum_tx_price.csv", "nass_sorghum_tx_yield.csv"),
+    CropId.soybean: ("nass_soybean_tx_price.csv", "nass_soybean_tx_yield.csv"),
+    CropId.wheat: ("nass_wheat_tx_price.csv", "nass_wheat_tx_yield.csv"),
+    CropId.peanut: ("nass_peanut_tx_price.csv", "nass_peanut_tx_yield.csv"),
+    CropId.oats_cover: ("nass_oats_tx_price.csv", "nass_oats_tx_yield.csv"),
 }
 
 
@@ -34,7 +38,8 @@ def _number(value: str | None) -> float | None:
     if not value:
         return None
     try:
-        parsed = float(value)
+        # NASS escribe los miles con coma ("2,490"); los códigos "(D)", "(S)" no son números.
+        parsed = float(value.replace(",", ""))
     except ValueError:
         return None
     return parsed if parsed == parsed and abs(parsed) != float("inf") else None

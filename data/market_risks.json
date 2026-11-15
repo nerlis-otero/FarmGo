@@ -10,5 +10,21 @@
   "sorghum": [
     "Lower market size than corn.",
     "Regional demand variability."
+  ],
+  "soybean": [
+    "Yield varied widely year to year (20 to 38 bu/acre in 2020-2025).",
+    "Price fell from 13.10 to 9.65 $/bu between 2022 and 2025."
+  ],
+  "wheat": [
+    "Price dropped from 9.15 to 4.84 $/bu between 2022 and 2025.",
+    "Low yield per acre (30 to 37 bu/acre) limits gross revenue."
+  ],
+  "peanut": [
+    "Yield declined from 3,620 to 2,490 lb/acre between 2021 and 2025.",
+    "Price per pound is low, so revenue depends on yield per acre."
+  ],
+  "oats_cover": [
+    "Grain price does not reflect its value as a cover crop.",
+    "NASS did not publish the 2025 price."
   ]
 }

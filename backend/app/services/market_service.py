@@ -21,6 +21,27 @@ GENERAL_GAPS = [
     "Los datos van de 2020 a 2025; el 2026 no se usa porque no ha terminado.",
 ]
 
+LAST_YEAR = 2025  # último año completo usado
+
+# Avisos propios de cada cultivo (se agregan a "gaps" solo cuando el cultivo se consulta).
+CROP_NOTES = {
+    "oats_cover": (
+        "oats_cover: precio y rendimiento son de avena para grano; no representan su uso "
+        "como cultivo de cobertura, que no genera ese ingreso."
+    ),
+}
+
+
+def _crop_gaps(crop: str, last_price_year: int) -> list[str]:
+    notes = []
+    if last_price_year < LAST_YEAR:
+        notes.append(
+            f"{crop}: NASS no publicó el precio de {LAST_YEAR}; se usa el de {last_price_year}."
+        )
+    if crop in CROP_NOTES:
+        notes.append(CROP_NOTES[crop])
+    return notes
+
 
 def _trend(prices: list[float] | pd.Series):
     """Compara el último precio contra el promedio de los años anteriores."""
@@ -77,6 +98,7 @@ def get_market_metrics(crop_ids: list[CropId]) -> MarketMetrics:
                 price_trend=_trend(p["price_value"]),
                 revenue_per_acre=_revenue_per_acre(crop.value, latest_price, avg_yield),
             )
+            gaps.extend(_crop_gaps(crop.value, int(p["year"].iloc[-1])))
     else:
         # Fallback estándar con módulo csv si pandas no está instalado
         prices_list: list[dict] = []
@@ -111,5 +133,6 @@ def get_market_metrics(crop_ids: list[CropId]) -> MarketMetrics:
                 price_trend=_trend(price_vals),
                 revenue_per_acre=_revenue_per_acre(crop.value, latest_price, avg_yield),
             )
+            gaps.extend(_crop_gaps(crop.value, int(p_rows[-1]["year"])))
 
     return MarketMetrics(crops=crops, gaps=gaps)

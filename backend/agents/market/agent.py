@@ -2,7 +2,8 @@
 from app.contracts import CropId
 from app.services.market_service import get_market_metrics
 
-CROPS = [CropId.corn, CropId.cotton, CropId.sorghum]
+# oats_cover queda fuera: es cultivo de cobertura, su precio de grano no define "qué vender".
+CROPS = [CropId.corn, CropId.cotton, CropId.sorghum, CropId.soybean, CropId.wheat, CropId.peanut]
 TREND_TEXT = {"up": "precio al alza", "flat": "precio estable", "down": "precio a la baja"}
 TREND_ADJ = {"up": 5, "flat": 0, "down": -10}
 

@@ -142,7 +142,7 @@ def recommend(req: RecommendRequest) -> RecommendResponse:
     )
 
 @app.get("/market", response_model=MarketMetrics)
-def market(crops: str = "corn,cotton,sorghum") -> MarketMetrics:
+def market(crops: str = "corn,cotton,sorghum,soybean,wheat,peanut,oats_cover") -> MarketMetrics:
     try:
         ids = [CropId(c.strip()) for c in crops.split(",")]
     except ValueError:

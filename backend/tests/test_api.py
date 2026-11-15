@@ -98,3 +98,12 @@ def test_unknown_farm_is_404():
 def test_missing_farm_and_point_is_422():
     r = client.post("/recommend", json={"priority": "Balanced"})
     assert r.status_code == 422
+
+def test_market_default_returns_all_crops_with_data():
+    r = client.get("/market")
+    assert r.status_code == 200
+    body = r.json()
+    assert set(body["crops"]) == {
+        "corn", "cotton", "sorghum", "soybean", "wheat", "peanut", "oats_cover"
+    }
+    assert all(c["revenue_per_acre"] > 0 for c in body["crops"].values())
