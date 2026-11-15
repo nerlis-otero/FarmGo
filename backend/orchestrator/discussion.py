@@ -1,11 +1,12 @@
 """Round 2: each agent reads the other agents' round-1 analyses and responds."""
 import asyncio
 import json
-from shared.config import MODEL_FAST, MODEL_SOIL
 
-AGENT_MODELS = {"climate": MODEL_FAST, "soil": MODEL_SOIL, "market": MODEL_FAST}
+from shared.config import MODEL_FAST, MODEL_SOIL
 from shared.groq_client import get_client
 from shared.json_utils import parse_llm_json
+
+AGENT_MODELS = {"climate": MODEL_FAST, "soil": MODEL_SOIL, "market": MODEL_FAST}
 
 ROLES = {
     "climate": "Climate Agent (weather, rainfall, soil moisture)",

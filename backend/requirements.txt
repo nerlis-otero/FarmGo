@@ -1,9 +1,18 @@
+# ── Core API ──────────────────────────────────────────────
 fastapi>=0.110
 uvicorn>=0.29
 pydantic>=2.6
+
+# ── HTTP / red ─────────────────────────────────────────────
+httpx>=0.27          # llamadas a NASA POWER, SSURGO, CropScape
+
+# ── IA / modelos Groq ──────────────────────────────────────
+groq>=1.7.0          # pipeline multi-agente (climate, soil, market, judge)
+
+# ── Tests ─────────────────────────────────────────────────
 pytest>=8.0
-httpx>=0.27
-groq==0.31.0
-python-dotenv
-requests>=2.31
-pandas>=2.0
+
+# ── Opcionales (el código funciona sin ellos con fallback) ─
+# python-dotenv       # carga .env automáticamente; si no está se lee con os.getenv
+# pandas>=2.0         # lectura rápida de CSVs; si no está usa csv nativo
+# requests>=2.31      # si no está usa httpx como fallback

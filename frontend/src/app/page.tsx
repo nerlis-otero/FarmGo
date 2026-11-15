@@ -138,6 +138,8 @@ export default function Home() {
                 setSelected({ farmId: "custom", lat, lon: lng });
                 setLocationError(null);
               }}
+              showLocateButton={false}
+              showStatus={false}
             />
             <div className="flex flex-wrap items-center justify-between gap-3">
               {selected ? (
