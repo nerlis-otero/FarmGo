@@ -7,7 +7,15 @@ import BluebyStage from "@/components/BluebyStage";
 import RotationCard from "@/components/RotationCard";
 import { bluebySummary } from "@/data/blueby";
 import { analyzeCropChoice } from "@/data/cropAnalysis";
-import { CROP_NAMES, parsePriority, priorityLabel } from "@/data/labels";
+import {
+  CROP_NAMES,
+  OVERALL_WORDS,
+  RATING_DOT,
+  parsePriority,
+  priorityLabel,
+  rating,
+  rotationName,
+} from "@/data/labels";
 import { useCropCatalog } from "@/hooks/useCropCatalog";
 import { useRecommendation } from "@/hooks/useRecommendation";
 import { CROP_IDS, type CropId } from "@/types/contracts";
@@ -48,14 +56,22 @@ function Comparison() {
   const query = queryParams.toString();
 
   if (loading) {
-    return <p role="status" className="rounded-xl bg-white/90 p-5">Preparing your crop plans…</p>;
+    return (
+      <p role="status" className="rounded-xl bg-white/90 p-5">
+        Preparing your crop plans…
+      </p>
+    );
   }
   if (error || !recommendation) {
     return (
       <section role="alert" className="rounded-2xl bg-white/95 p-6 shadow-soft">
         <h1 className="text-2xl font-bold">We couldn’t load the crop plans</h1>
         <p className="mt-2">{error}</p>
-        <button type="button" onClick={retry} className="mt-4 rounded-lg bg-indigo px-5 py-3 font-bold text-white">
+        <button
+          type="button"
+          onClick={retry}
+          className="mt-4 rounded-lg bg-indigo px-5 py-3 font-bold text-white"
+        >
           Try again
         </button>
       </section>
@@ -65,66 +81,187 @@ function Comparison() {
   const best = recommendation.rotations.find(
     (rotation) => rotation.id === recommendation.best_rotation_id,
   );
-  const cropSuggestion = cropsLoading || cropCatalogError || (hasCrops && currentCrops.length === 0)
-    ? null
-    : analyzeCropChoice(recommendation, cropCatalog, hasCrops, currentCrops);
+  const currentRotation = recommendation.rotations.find((rotation) => rotation.is_current);
+  const suggestedRotations = recommendation.rotations.filter((rotation) => !rotation.is_current);
+  const cropSuggestion =
+    cropsLoading || cropCatalogError || (hasCrops && currentCrops.length === 0)
+      ? null
+      : analyzeCropChoice(recommendation, cropCatalog, hasCrops, currentCrops);
+  const bestOverall = best ? rating(best.scores.total) : null;
+  const bestTitle = best
+    ? best.sequence.length > 0
+      ? rotationName(best.sequence)
+      : best.label
+    : null;
+  const dataChip =
+    source === "saved-demo"
+      ? "Demo fallback"
+      : farm === "custom"
+        ? "Live climate for your pin"
+        : "Sample farm data";
+
+  const formatCropText = (val: string | null | undefined) => {
+    if (!val) return "";
+    const clean = val.trim();
+    const lower = clean.toLowerCase();
+    if (CROP_NAMES[lower]) return CROP_NAMES[lower];
+    return clean.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
+  const suggestedRotationValue =
+    bestTitle &&
+    (!recommendation?.agent_report?.verdict?.recommended_rotation ||
+      recommendation.agent_report.verdict.recommended_rotation.toLowerCase().startsWith("suggested rotation"))
+      ? bestTitle
+      : recommendation?.agent_report?.verdict?.recommended_rotation || bestTitle;
+
+  const displayReasoning = recommendation?.agent_report?.verdict?.reasoning
+    ? recommendation.agent_report.verdict.reasoning.replace(
+        /Suggested rotation \d+/gi,
+        bestTitle || "recommended rotation",
+      )
+    : "";
 
   return (
-    <div className="flex flex-col gap-6">
-      <Link href="/" className="w-fit font-bold text-indigo underline underline-offset-4">
-        ← Change farm or goal
-      </Link>
-
-      <div className="rounded-xl border border-straw/80 bg-white/90 px-4 py-3 shadow-sm">
-        <p className="font-bold text-navy">
-          {source === "saved-demo"
-            ? "Using saved demo results"
-            : farm === "custom"
-              ? "Climate data for your marked location"
-              : "Sample data: High Plains (Lubbock)"}
-        </p>
-        <p className="text-base text-navy/70">
-          {source === "saved-demo"
-            ? "Location-based climate data could not be loaded, so these saved Lubbock examples are shown instead. They do not use your marked location."
-            : farm === "custom"
-              ? "Climate scores use NASA POWER data for the coordinates you marked. Soil scores use draft crop traits, and market scores use Texas-wide data where available; neither is measured for your field."
-              : "The backend recalculates scores for your goal, but it currently uses Lubbock test data. Your selected location does not change this example."}
-        </p>
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Link href="/" className="w-fit font-bold text-indigo underline underline-offset-4">
+          ← Change farm or goal
+        </Link>
+        <span className="rounded-full bg-mist px-3 py-1 text-sm font-semibold text-navy/75">
+          {dataChip}
+        </span>
       </div>
 
-      <BluebyStage text={bluebySummary(recommendation)} />
+      <BluebyStage text={bluebySummary(recommendation)} compact />
+
+      {best && bestTitle && bestOverall && (
+        <section className="rounded-2xl border-2 border-fern/50 bg-foam p-4 shadow-soft sm:p-5">
+          <p className="text-sm font-bold uppercase tracking-[0.12em] text-fern">
+            Best plan · {priorityLabel(priority)}
+          </p>
+          <h1 className="mt-1 text-2xl font-bold sm:text-3xl">{bestTitle}</h1>
+          <p className="mt-2 flex flex-wrap items-center gap-2 font-bold">
+            <span className={`h-3 w-3 rounded-full ${RATING_DOT[bestOverall]}`} aria-hidden="true" />
+            {OVERALL_WORDS[bestOverall]}
+            <span className="font-semibold text-navy/55">· {best.scores.total}/100</span>
+          </p>
+          {cropSuggestion?.crop && (
+            <p className="mt-3 rounded-xl bg-white/85 px-3 py-2 font-semibold">
+              {hasCrops ? "Crop to add: " : "Start with: "}
+              <span className="text-fern">{CROP_NAMES[cropSuggestion.crop.crop_id]}</span>
+            </p>
+          )}
+          <Link
+            href={`/rotacion/${best.id}?${query}`}
+            className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-indigo px-5 py-2.5 font-bold text-white hover:bg-navy"
+          >
+            Open best plan
+          </Link>
+        </section>
+      )}
+
+      {cropSuggestion?.crop && (
+        <ul className="flex flex-wrap gap-2 text-sm">
+          <li className="rounded-full bg-white/90 px-3 py-1 font-medium shadow-sm">
+            {cropSuggestion.crop.drought_tolerance[0].toUpperCase() +
+              cropSuggestion.crop.drought_tolerance.slice(1)}{" "}
+            drought tolerance
+          </li>
+          <li className="rounded-full bg-white/90 px-3 py-1 font-medium shadow-sm">
+            {cropSuggestion.crop.water_mm_season_min}–{cropSuggestion.crop.water_mm_season_max} mm
+            water
+          </li>
+          {cropSuggestion.crop.fixes_nitrogen && (
+            <li className="rounded-full bg-white/90 px-3 py-1 font-medium shadow-sm">
+              Fixes nitrogen
+            </li>
+          )}
+          {cropSuggestion.crop.is_cover_crop && (
+            <li className="rounded-full bg-white/90 px-3 py-1 font-medium shadow-sm">
+              Cover crop
+            </li>
+          )}
+        </ul>
+      )}
+
+      {!cropsLoading && !cropSuggestion?.crop && (cropCatalogError || cropSuggestion) && (
+        <p className="rounded-xl bg-white/90 px-4 py-3 text-sm text-navy/80">
+          {cropCatalogError
+            ? `Crop tip unavailable: ${cropCatalogError}`
+            : cropSuggestion?.reason === "no-different-family-option"
+              ? "No different crop family found in the example plans."
+              : "You already grow every crop in these examples."}
+        </p>
+      )}
+
+      {currentRotation && (
+        <section className="rounded-xl border border-navy/10 bg-white/90 px-4 py-3">
+          <p className="text-sm font-bold uppercase tracking-[0.12em] text-navy/55">Your crops</p>
+          <p className="mt-1 font-bold">
+            {currentRotation.sequence.length > 0
+              ? rotationName(currentRotation.sequence)
+              : currentRotation.label}
+          </p>
+          <p className="mt-1 text-sm text-navy/65">
+            Baseline for comparison — not a suggested plan.
+          </p>
+        </section>
+      )}
+
+      <section>
+        <h2 className="text-xl font-bold sm:text-2xl">Suggested plans</h2>
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+          {suggestedRotations.map((rotation) => (
+            <RotationCard
+              key={rotation.id}
+              rotation={rotation}
+              isBest={rotation.id === recommendation.best_rotation_id}
+              href={`/rotacion/${rotation.id}?${query}`}
+            />
+          ))}
+        </div>
+      </section>
 
       {recommendation.agent_report && (
         <section
           aria-labelledby="agent-verdict-heading"
           className="rounded-2xl border-2 border-fern/40 bg-foam p-5 shadow-soft sm:p-6"
         >
-          <p className="text-sm font-bold uppercase tracking-[0.14em] text-fern">
-            Farm team verdict · {recommendation.agent_report.verdict.confidence} confidence
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-fern">
+              Farm team verdict · {recommendation.agent_report.verdict.confidence} confidence
+            </p>
+            <span className="rounded-full bg-white/90 px-3 py-0.5 text-xs font-bold text-fern shadow-xs">
+              Multi-Agent AI
+            </span>
+          </div>
           <h2 id="agent-verdict-heading" className="mt-1 text-2xl font-bold">
             What the specialists recommend
           </h2>
-          <p className="mt-2">{recommendation.agent_report.verdict.reasoning}</p>
+          <p className="mt-2 text-navy/85">{displayReasoning}</p>
 
-          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+          <dl className="mt-4 grid gap-2.5 sm:grid-cols-2">
             {[
-              ["Best crop to grow", recommendation.agent_report.verdict.best_crop_to_grow],
-              ["Best crop to sell", recommendation.agent_report.verdict.best_crop_to_sell],
-              ["Suggested rotation", recommendation.agent_report.verdict.recommended_rotation],
-              ["Best overall crop", recommendation.agent_report.verdict.best_overall_crop],
-            ].map(([label, value]) => value && (
-              <div key={label} className="rounded-xl bg-white/80 p-3">
-                <dt className="text-sm font-bold text-navy/70">{label}</dt>
-                <dd className="mt-1 font-bold">{value}</dd>
-              </div>
-            ))}
+              ["Best to grow", formatCropText(recommendation.agent_report.verdict.best_crop_to_grow)],
+              ["Best to sell", formatCropText(recommendation.agent_report.verdict.best_crop_to_sell)],
+              ["Suggested rotation", suggestedRotationValue],
+              ["Best overall", formatCropText(recommendation.agent_report.verdict.best_overall_crop)],
+            ].map(
+              ([label, value]) =>
+                value && (
+                  <div key={label} className="rounded-xl bg-white/90 p-3 shadow-xs">
+                    <dt className="text-xs font-bold uppercase tracking-wider text-navy/60">{label}</dt>
+                    <dd className="mt-0.5 font-bold text-navy">{value}</dd>
+                  </div>
+                ),
+            )}
           </dl>
 
           {recommendation.agent_report.verdict.things_to_consider.length > 0 && (
-            <div className="mt-4 rounded-xl border border-straw/80 bg-white/80 p-4">
-              <h3 className="font-bold">Things to check before deciding</h3>
-              <ul className="mt-2 list-disc space-y-1 pl-5">
+            <div className="mt-4 rounded-xl border border-straw/80 bg-white/80 p-3.5">
+              <h3 className="font-bold text-sm text-navy">Things to check before planting</h3>
+              <ul className="mt-1.5 list-disc space-y-1 pl-5 text-sm text-navy/80">
                 {recommendation.agent_report.verdict.things_to_consider.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -134,32 +271,40 @@ function Comparison() {
 
           {recommendation.agent_report.verdict.gaps.length > 0 && (
             <div className="mt-3">
-              <h3 className="font-bold">Missing information</h3>
-              <ul className="mt-1 list-disc space-y-1 pl-5 text-navy/80">
-                {recommendation.agent_report.verdict.gaps.map((item) => <li key={item}>{item}</li>)}
+              <h3 className="text-xs font-bold uppercase tracking-wider text-navy/60">Missing information</h3>
+              <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-navy/70">
+                {recommendation.agent_report.verdict.gaps.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
               </ul>
             </div>
           )}
 
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {([
-              ["Climate", recommendation.agent_report.climate],
-              ["Soil and rotation", recommendation.agent_report.soil],
-              ["Market", recommendation.agent_report.market],
-            ] as const).map(([name, agent]) => (
-              <article key={name} className="rounded-xl border border-navy/10 bg-white/80 p-4">
-                <h3 className="font-bold">{name} specialist</h3>
+            {(
+              [
+                ["Climate Specialist", recommendation.agent_report.climate],
+                ["Soil & Rotation Specialist", recommendation.agent_report.soil],
+                ["Market Specialist", recommendation.agent_report.market],
+              ] as const
+            ).map(([name, agent]) => (
+              <article key={name} className="flex flex-col rounded-xl border border-navy/10 bg-white/90 p-4 shadow-xs">
+                <h3 className="font-bold text-navy">{name}</h3>
                 {agent.status === "unavailable" ? (
-                  <p className="mt-2 text-low">{agent.error}</p>
+                  <p className="mt-2 text-sm text-low">{agent.error}</p>
                 ) : (
                   <>
                     {agent.score !== null && (
-                      <p className="mt-1 text-sm font-semibold">Agent score: {agent.score} / 100</p>
+                      <p className="mt-1 text-sm font-semibold text-fern">Score: {agent.score} / 100</p>
                     )}
-                    {agent.recommendation && <p className="mt-2">{agent.recommendation}</p>}
+                    {agent.recommendation && (
+                      <p className="mt-2 text-sm font-medium text-navy">{agent.recommendation}</p>
+                    )}
                     {agent.reasons.length > 0 && (
-                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-navy/80">
-                        {agent.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                      <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-navy/75">
+                        {agent.reasons.map((reason) => (
+                          <li key={reason}>{reason}</li>
+                        ))}
                       </ul>
                     )}
                   </>
@@ -175,153 +320,79 @@ function Comparison() {
               agent.disagreements.length > 0 ||
               agent.error,
           ) && (
-            <section className="mt-4 rounded-xl bg-white/80 p-4">
-              <h3 className="font-bold">Agent discussion</h3>
-              <ul className="mt-2 space-y-2">
+            <div className="mt-4 rounded-xl border border-navy/10 bg-white/80 p-4">
+              <h3 className="font-bold text-navy text-sm uppercase tracking-wide">Multi-Agent Discussion</h3>
+              <ul className="mt-2 space-y-2 text-sm">
                 {Object.entries(recommendation.agent_report.discussion).map(([name, agent]) => (
                   <li key={name}>
-                    <strong className="capitalize">{name}:</strong>{" "}
-                    {agent.error ?? agent.position ?? "No discussion summary is available."}
+                    <strong className="capitalize text-navy">{name}:</strong>{" "}
+                    <span className="text-navy/85">
+                      {agent.error ?? agent.position ?? "No discussion summary is available."}
+                    </span>
                     {agent.agreements.length > 0 && (
-                      <span className="block text-navy/75">
-                        Shared points: {agent.agreements.join("; ")}
+                      <span className="block text-xs text-navy/70 mt-0.5">
+                        • Shared points: {agent.agreements.join("; ")}
                       </span>
                     )}
                     {agent.disagreements.length > 0 && (
-                      <span className="block text-navy/75">
-                        Points of difference: {agent.disagreements.join("; ")}
+                      <span className="block text-xs text-navy/70 mt-0.5">
+                        • Points of difference: {agent.disagreements.join("; ")}
                       </span>
                     )}
                   </li>
                 ))}
               </ul>
-            </section>
+            </div>
           )}
         </section>
       )}
 
-      <section className="rounded-2xl border border-fern/30 bg-white/95 p-5 shadow-soft sm:p-6">
-        <p className="text-sm font-bold uppercase tracking-[0.14em] text-fern">
-          {hasCrops ? "Crop to add to your rotation" : "Best crop to start with"}
-        </p>
-        {cropSuggestion?.crop ? (
-          <>
-            <h2 className="mt-1 text-2xl font-bold">
-              {CROP_NAMES[cropSuggestion.crop.crop_id]}
-            </h2>
-            <p className="mt-2">
-              {hasCrops
-                ? `We chose this crop because it is in ${cropSuggestion.rotation.label}, you don’t already grow it, and it belongs to a different plant family than your selected crops. The plan scores ${cropSuggestion.rotation.scores.total} out of 100 for your ${priorityLabel(priority).toLowerCase()} goal.`
-                : `This is the first crop in the highest-scoring suggested rotation, which scores ${cropSuggestion.rotation.scores.total} out of 100 for your ${priorityLabel(priority).toLowerCase()} goal.`}
-            </p>
-            <p className="mt-2 text-sm text-navy/70">
-              {farm === "custom" && source === "backend"
-                ? "Your crop selection is used to show your current-crop baseline and help identify a crop to rotate in."
-                : "Your crop selection helps identify a crop you do not already grow; the saved demo score is not specific to your field."}
-            </p>
-            {hasCrops && currentCrops.length > 0 && (
-              <p className="mt-2 text-sm text-navy/70">
-                You selected: {currentCrops.map((crop) => CROP_NAMES[crop]).join(", ")}.
-              </p>
-            )}
-            <ul className="mt-3 flex flex-wrap gap-2 text-sm">
-              <li className="rounded-full bg-foam px-3 py-1">
-                {cropSuggestion.crop.drought_tolerance[0].toUpperCase() +
-                  cropSuggestion.crop.drought_tolerance.slice(1)}{" "}
-                drought tolerance
-              </li>
-              <li className="rounded-full bg-foam px-3 py-1">
-                {cropSuggestion.crop.water_mm_season_min}–{cropSuggestion.crop.water_mm_season_max} mm
-                seasonal water range
-              </li>
-              {cropSuggestion.crop.fixes_nitrogen && (
-                <li className="rounded-full bg-foam px-3 py-1">Nitrogen-fixing crop</li>
-              )}
-              {cropSuggestion.crop.is_cover_crop && (
-                <li className="rounded-full bg-foam px-3 py-1">Cover crop</li>
-              )}
-            </ul>
-            <p className="mt-3 text-sm text-navy/70">
-              Crop profile status: <span className="font-semibold text-fern">Verified</span>. Water and crop traits are validated against Texas A&M AgriLife Extension and USDA agronomic standards.
-            </p>
-          </>
-        ) : cropCatalogError ? (
-          <p role="alert" className="mt-2">
-            The crop recommendation could not be calculated because the crop catalog could not be loaded:
-            {" "}{cropCatalogError}
+      {source === "saved-demo" && (
+        <div className="rounded-xl border border-straw/80 bg-straw/40 px-4 py-3 text-sm">
+          <p className="font-bold">Live recommendation service was offline</p>
+          <p className="mt-1 text-navy/80">
+            Showing saved Lubbock examples instead. Start the backend on port 8000 and reload to get
+            location-based plans.
           </p>
-        ) : cropsLoading ? (
-          <p role="status" className="mt-2">Loading crop profiles…</p>
-        ) : hasCrops && currentCrops.length === 0 ? (
-          <p className="mt-2">
-            No current crops were selected. Go back and choose at least one crop to get a rotation suggestion.
-          </p>
-        ) : cropSuggestion?.reason === "no-different-family-option" ? (
-          <p className="mt-2">
-            The example plans do not include a new crop from a different crop group than the crops
-            you selected. We can’t confidently suggest a crop to rotate in from the available examples.
-          </p>
-        ) : (
-          <p className="mt-2">
-            You already grow every crop in the example plans. Review your selection or ask a local
-            agricultural specialist about other options.
-          </p>
-        )}
-      </section>
-
-      <section>
-        <p className="mb-1 text-sm font-bold uppercase tracking-[0.14em] text-fern">
-          Your goal: {priorityLabel(priority)}
-        </p>
-        <h1 className="text-3xl font-bold sm:text-4xl">Compare crop plans</h1>
-        <p className="mt-2 max-w-3xl text-navy/75">
-          A crop rotation is the order in which you grow crops across seasons. Compare each plan,
-          then review its benefits and things to check.
-        </p>
-      </section>
-
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {recommendation.rotations.map((rotation) => (
-          <RotationCard
-            key={rotation.id}
-            rotation={rotation}
-            isBest={rotation.id === recommendation.best_rotation_id}
-            href={`/rotacion/${rotation.id}?${query}`}
-          />
-        ))}
-      </section>
-
-      {best && (
-        <section className="rounded-2xl border border-fern/20 bg-white/95 p-5 shadow-soft sm:p-6">
-          <p className="mb-1 text-sm font-bold uppercase tracking-[0.14em] text-fern">
-            Recommended plan and why it fits your goal
-          </p>
-          <h2 className="text-2xl font-bold">{best.label}</h2>
-          <p className="mt-2">{best.why}</p>
-          {recommendation.agent_report?.verdict.reasoning && (
-            <p className="mt-2">{recommendation.agent_report.verdict.reasoning}</p>
-          )}
-          {recommendation.agent_report?.verdict.recommended_rotation && (
-            <p className="mt-3 rounded-lg bg-foam p-3">
-              <strong>Specialists’ suggested rotation:</strong>{" "}
-              {recommendation.agent_report.verdict.recommended_rotation}
-            </p>
-          )}
-          {best.benefits.length > 0 && (
-            <ul className="mt-3 list-disc space-y-1 pl-5 text-navy/80">
-              {best.benefits.map((benefit) => <li key={benefit}>{benefit}</li>)}
-            </ul>
-          )}
-        </section>
+          <button
+            type="button"
+            onClick={retry}
+            className="mt-2 font-bold text-indigo underline underline-offset-2"
+          >
+            Retry live results
+          </button>
+        </div>
       )}
 
-      <section className="rounded-2xl bg-mist/90 p-5">
-        <h2 className="text-xl font-bold">About these results</h2>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-base text-navy/80">
-          {recommendation.data_notes.map((note) => <li key={note}>{note}</li>)}
-        </ul>
-        <p className="mt-3 text-base">{recommendation.disclaimer}</p>
-      </section>
+      <details className="panel rounded-2xl border border-navy/10 bg-mist/80">
+        <summary className="flex items-center justify-between gap-3 px-4 py-3 font-bold sm:px-5">
+          <span>About the data</span>
+          <span className="text-sm font-semibold text-navy/55">Show details</span>
+        </summary>
+        <div className="border-t border-navy/10 px-4 py-4 text-sm text-navy/80 sm:px-5">
+          <p>
+            {source === "saved-demo"
+              ? "These are saved demo scores, not results for your marked field."
+              : farm === "custom"
+                ? "Climate uses NASA POWER for your pin. Soil and market scores are regional estimates, not field measurements."
+                : "Scores use sample farm data for this example."}
+          </p>
+          {recommendation.data_notes.length > 0 && (
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {recommendation.data_notes
+                .filter(
+                  (note) =>
+                    !note.includes("recommendation API is unavailable") &&
+                    !note.includes("Saved Lubbock example results are shown"),
+                )
+                .map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+            </ul>
+          )}
+          <p className="mt-2">{recommendation.disclaimer}</p>
+        </div>
+      </details>
     </div>
   );
 }

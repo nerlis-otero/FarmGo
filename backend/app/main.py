@@ -66,6 +66,26 @@ def farms() -> list[dict]:
     return load_farms()
 
 
+CROP_DISPLAY_NAMES = {
+    "corn": "Corn",
+    "cotton": "Cotton",
+    "sorghum": "Sorghum",
+    "soybean": "Soybean",
+    "wheat": "Wheat",
+    "peanut": "Peanuts",
+    "oats_cover": "Cover crop oats",
+    "forage_grass": "Forage grass",
+}
+
+
+def format_crop_sequence(seq: list) -> str:
+    parts = []
+    for c in seq:
+        val = c.value if hasattr(c, "value") else str(c)
+        parts.append(CROP_DISPLAY_NAMES.get(val, val.replace("_", " ").title()))
+    return " → ".join(parts)
+
+
 @app.post("/recommend", response_model=RecommendResponse, responses={404: {"description": "Finca desconocida"}})
 async def recommend(req: RecommendRequest) -> RecommendResponse:
     if req.lat is not None and req.lon is not None:
@@ -77,7 +97,22 @@ async def recommend(req: RecommendRequest) -> RecommendResponse:
                 req.current_crops,
             )
             crops_list = [c.value if hasattr(c, "value") else str(c) for c in req.current_crops]
-            response.agent_report = await run_pipeline(req.lat, req.lon, req.priority.value, crops_list)
+            best_rot = next((r for r in response.rotations if r.id == response.best_rotation_id), None)
+            best_seq_formatted = (
+                format_crop_sequence(best_rot.sequence)
+                if best_rot and best_rot.sequence
+                else (best_rot.label if best_rot else "Optimal Crop Rotation")
+            )
+            best_plan_dict = {
+                "id": best_rot.id,
+                "label": best_seq_formatted,
+                "sequence": [c.value if hasattr(c, "value") else str(c) for c in best_rot.sequence],
+                "scores": best_rot.scores.model_dump(),
+                "benefits": best_rot.benefits,
+            } if best_rot else None
+            response.agent_report = await run_pipeline(
+                req.lat, req.lon, req.priority.value, crops_list, best_plan=best_plan_dict
+            )
             return response
         except (RequestException, OSError, ValueError) as error:
             logger.warning(

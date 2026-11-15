@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy: #203b32;
-  --color-bluebonnet: #658879;
-  --color-indigo: #286649;
-  --color-mist: #e4eee6;
-  --color-foam: #f3f7ef;
-  --color-page: #f7f8f2;
-  --color-field: #75a77c;
-  --color-fern: #32774d;
-  --color-straw: #f3e7c7;
-  --color-ok: #a96d22;
-  --color-low: #aa493a;
-  --shadow-soft: 0 14px 40px rgb(32 59 50 / 8%);
+  /* Paleta Ivory & Sky Earth */
+  --color-page: #feffef;          /* IVORY (#FEFFEF): Fondo principal cálido y luminoso */
+  --color-navy: #233b14;          /* Tono profundo de Mushroom Green: Títulos, encabezados y bordes contrastados */
+  --color-body: #3d4a36;          /* Tono tierra oscuro para textos y párrafos legibles */
+  --color-fern: #447027;          /* MUSHROOM GREEN (#447027): Verdor de identidad, Best Plan, éxito y logo */
+  --color-field: #5b8e3a;         /* MUSHROOM GREEN medio: Acentos vegetales y fondo de campos */
+  --color-indigo: #52aae9;        /* NOBEL SKY BLUE (#52AAE9): Botones de acción principales y enlaces */
+  --color-bluebonnet: #52aae9;    /* NOBEL SKY BLUE (#52AAE9): Acento cielo */
+  --color-straw: #e1ea7b;         /* DUSTY LEMON (#E1EA7B): Sol, avisos, acentos y resaltes */
+  --color-ok: #a38510;            /* Tono accesible para puntuaciones medias */
+  --color-low: #d66452;           /* Tono cálido para puntuaciones bajas */
+  --color-foam: #f2f8e4;          /* Tinte Ivory + Verdor: Fondo de tarjeta destacada */
+  --color-mist: #e8f4fc;          /* Tinte Ivory + Sky Blue: Chips secundarios y etiquetas */
+  --shadow-soft: 0 12px 36px rgb(35 59 20 / 8%);
 }
 
 @layer components {
@@ -40,14 +42,17 @@
   }
 }
 
-:focus-visible {
-  outline: 3px solid var(--color-indigo);
-  outline-offset: 3px;
-}
+@layer base {
+  :focus-visible {
+    outline: 3px solid var(--color-indigo);
+    outline-offset: 2px;
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
+  details.panel > summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  details.panel > summary::-webkit-details-marker {
+    display: none;
   }
 }

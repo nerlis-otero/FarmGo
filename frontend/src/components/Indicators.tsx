@@ -2,53 +2,64 @@ import { RATING_DOT, RATING_WORDS, rating } from "@/data/labels";
 import type { Rotation } from "@/types/recommendation";
 
 function Indicator({
-  emoji,
   label,
   meaning,
   score,
+  compact,
 }: {
-  emoji: string;
   label: string;
-  meaning: string;
+  meaning?: string;
   score: number;
+  compact?: boolean;
 }) {
   const r = rating(score);
   return (
-    <li className="flex items-center gap-3 rounded-lg bg-foam px-3 py-2.5">
-      <span aria-hidden="true" className="text-2xl">{emoji}</span>
+    <li
+      className={`flex items-center justify-between gap-3 rounded-lg bg-foam ${
+        compact ? "px-2.5 py-1.5" : "px-3 py-2"
+      }`}
+    >
       <div className="min-w-0 flex-1">
-        <p className="font-bold">{label}</p>
-        <p className="text-sm leading-snug text-navy/70">{meaning}</p>
+        <p className="text-sm font-bold text-navy">{label}</p>
+        {!compact && meaning && (
+          <p className="text-xs leading-snug text-navy/70">{meaning}</p>
+        )}
       </div>
       <span className="flex shrink-0 items-center gap-1.5 text-sm font-bold">
         <span className={`h-2.5 w-2.5 rounded-full ${RATING_DOT[r]}`} aria-hidden="true" />
         <span className="sr-only">{RATING_WORDS[r]}: </span>
-        {score}/100
+        {score}
       </span>
     </li>
   );
 }
 
-export default function Indicators({ scores }: { scores: Rotation["scores"] }) {
+export default function Indicators({
+  scores,
+  compact = false,
+}: {
+  scores: Rotation["scores"];
+  compact?: boolean;
+}) {
   return (
-    <ul className="flex flex-col gap-2.5">
+    <ul className={`flex flex-col ${compact ? "gap-1.5" : "gap-2"}`}>
       <Indicator
-        emoji="🌦️"
-        label="Climate & water"
+        label="Climate"
         meaning="Weather fit and how much water crops may need."
         score={scores.climate}
+        compact={compact}
       />
       <Indicator
-        emoji="🌱"
-        label="Soil health"
+        label="Soil"
         meaning="How this rotation may protect and support the soil."
         score={scores.soil}
+        compact={compact}
       />
       <Indicator
-        emoji="💰"
-        label="Market potential"
+        label="Market"
         meaning="Example crop demand and earning potential, before costs."
         score={scores.market}
+        compact={compact}
       />
     </ul>
   );

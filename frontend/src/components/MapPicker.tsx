@@ -22,14 +22,15 @@ type Props = {
   showStatus?: boolean; // false si tu página ya muestra "Your location is not saved"
 };
 
-const DEFAULT_CENTER: [number, number] = [10.4, -75.5]; // Caribe colombiano; cámbialo si quieres
+const DEFAULT_CENTER: [number, number] = [31.5, -99.5]; // Texas
 const DEFAULT_ZOOM = 6;
+const MARKER_COLOR = "#2a6b45";
 const round = (n: number) => Math.round(n * 1e5) / 1e5; // ~1 m de precisión
 
 export default function MapPicker({
   value,
   onChange,
-  height = 360,
+  height = 420,
   showLocateButton = true,
   showStatus = true,
 }: Props) {
@@ -58,7 +59,7 @@ export default function MapPicker({
       // divIcon: evita el bug clásico de Next.js donde no cargan las imágenes del pin por defecto
       const icon = L.divIcon({
         className: "",
-        html: `<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:#1f5d3a;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);transform:rotate(-45deg)"></div>`,
+        html: `<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:${MARKER_COLOR};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);transform:rotate(-45deg)"></div>`,
         iconSize: [28, 28],
         iconAnchor: [14, 28],
       });
@@ -79,7 +80,7 @@ export default function MapPicker({
     if (c.accuracy && c.accuracy > 0) {
       circleRef.current = L.circle(latlng, {
         radius: c.accuracy,
-        color: "#1f5d3a",
+        color: MARKER_COLOR,
         weight: 1,
         fillOpacity: 0.12,
       }).addTo(map);

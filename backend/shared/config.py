@@ -12,9 +12,16 @@ if ENV_FILE.exists():
             os.environ.setdefault(k.strip(), v.strip())
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-MODEL_SOIL  = os.getenv("MODEL_SOIL",  "qwen/qwen3.8-27b")       # agente suelo
-MODEL_FAST  = os.getenv("MODEL_FAST",  "openai/gpt-oss-20b")     # agentes clima y mercado
-MODEL_JUDGE = os.getenv("MODEL_JUDGE", "openai/gpt-oss-120b")    # discusión y veredicto
+
+# Mapear modelos para que siempre usen IDs oficiales y funcionales de Groq
+def _resolve_groq_model(model_name: str | None, default: str) -> str:
+    if not model_name or "openai/" in model_name or "qwen/" in model_name:
+        return default
+    return model_name
+
+MODEL_SOIL  = _resolve_groq_model(os.getenv("MODEL_SOIL"),  "llama-3.1-8b-instant")
+MODEL_FAST  = _resolve_groq_model(os.getenv("MODEL_FAST"),  "llama-3.1-8b-instant")
+MODEL_JUDGE = _resolve_groq_model(os.getenv("MODEL_JUDGE"), "llama-3.3-70b-versatile")
 
 
 CACHE_DIR = Path(__file__).resolve().parent.parent / ".cache"
