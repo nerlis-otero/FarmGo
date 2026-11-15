@@ -14,6 +14,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.contracts import PRIORITY_WEIGHTS, RecommendRequest, RecommendResponse
+from app.services.llm_service import explain_recommendation
 
 ROOT = Path(__file__).resolve().parents[2]  # raiz del repo
 MOCK_PATH = ROOT / "data" / "mocks" / "recommend_farm_1.json"
@@ -66,6 +67,7 @@ def recommend(req: RecommendRequest) -> RecommendResponse:
         rotations.append(r.model_copy(update={"scores": s.model_copy(update={"total": total})}))
 
     best = max(rotations, key=lambda r: r.scores.total)
+    print(best)
     return resp.model_copy(
         update={
             "farm_id": req.farm_id or "custom",
