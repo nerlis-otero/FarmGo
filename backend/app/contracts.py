@@ -117,6 +117,7 @@ class CropMarket(BaseModel):
     typical_yield: Optional[float] = None
     yield_unit: Optional[str] = None          # ej. "bushels/acre"
     price_trend: Optional[Literal["up", "flat", "down"]] = None
+    revenue_per_acre: Optional[float] = None  # USD/acre, ingreso bruto estimado
 
 
 class MarketMetrics(BaseModel):
