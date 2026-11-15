@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import BluebyStage from "@/components/BluebyStage";
@@ -44,6 +44,7 @@ function Comparison() {
     loading: cropsLoading,
     error: cropCatalogError,
   } = useCropCatalog();
+  const [teamTab, setTeamTab] = useState<"verdict" | "specialists" | "debate">("verdict");
 
   const queryParams = new URLSearchParams({
     farm,
@@ -236,90 +237,113 @@ function Comparison() {
               Multi-Agent AI
             </span>
           </div>
-          <h2 id="agent-verdict-heading" className="mt-1 text-2xl font-bold">
-            What the specialists recommend
-          </h2>
-          <p className="mt-2 text-navy/85">{displayReasoning}</p>
-
-          <dl className="mt-4 grid gap-2.5 sm:grid-cols-2">
-            {[
-              ["Best to grow", formatCropText(recommendation.agent_report.verdict.best_crop_to_grow)],
-              ["Best to sell", formatCropText(recommendation.agent_report.verdict.best_crop_to_sell)],
-              ["Suggested rotation", suggestedRotationValue],
-              ["Best overall", formatCropText(recommendation.agent_report.verdict.best_overall_crop)],
-            ].map(
-              ([label, value]) =>
-                value && (
-                  <div key={label} className="rounded-xl bg-white/90 p-3 shadow-xs">
-                    <dt className="text-xs font-bold uppercase tracking-wider text-navy/60">{label}</dt>
-                    <dd className="mt-0.5 font-bold text-navy">{value}</dd>
-                  </div>
-                ),
-            )}
-          </dl>
-
-          {recommendation.agent_report.verdict.things_to_consider.length > 0 && (
-            <div className="mt-4 rounded-xl border border-straw/80 bg-white/80 p-3.5">
-              <h3 className="font-bold text-sm text-navy">Things to check before planting</h3>
-              <ul className="mt-1.5 list-disc space-y-1 pl-5 text-sm text-navy/80">
-                {recommendation.agent_report.verdict.things_to_consider.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 id="agent-verdict-heading" className="mt-1 text-2xl font-bold">
+              What the specialists recommend
+            </h2>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { id: "verdict", label: "Team Verdict" },
+                { id: "specialists", label: "Specialist Evidence (NASA & USDA)" },
+                { id: "debate", label: "Multi-Agent Debate" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setTeamTab(tab.id as typeof teamTab)}
+                  className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+                    teamTab === tab.id
+                      ? "bg-indigo text-white shadow-xs"
+                      : "bg-white/80 text-navy/70 hover:bg-white hover:text-navy"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
-          )}
-
-          {recommendation.agent_report.verdict.gaps.length > 0 && (
-            <div className="mt-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-navy/60">Missing information</h3>
-              <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-navy/70">
-                {recommendation.agent_report.verdict.gaps.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {(
-              [
-                ["Climate Specialist", recommendation.agent_report.climate],
-                ["Soil & Rotation Specialist", recommendation.agent_report.soil],
-                ["Market Specialist", recommendation.agent_report.market],
-              ] as const
-            ).map(([name, agent]) => (
-              <article key={name} className="flex flex-col rounded-xl border border-navy/10 bg-white/90 p-4 shadow-xs">
-                <h3 className="font-bold text-navy">{name}</h3>
-                {agent.status === "unavailable" ? (
-                  <p className="mt-2 text-sm text-low">{agent.error}</p>
-                ) : (
-                  <>
-                    {agent.score !== null && (
-                      <p className="mt-1 text-sm font-semibold text-fern">Score: {agent.score} / 100</p>
-                    )}
-                    {agent.recommendation && (
-                      <p className="mt-2 text-sm font-medium text-navy">{agent.recommendation}</p>
-                    )}
-                    {agent.reasons.length > 0 && (
-                      <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-navy/75">
-                        {agent.reasons.map((reason) => (
-                          <li key={reason}>{reason}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </>
-                )}
-              </article>
-            ))}
           </div>
 
-          {Object.values(recommendation.agent_report.discussion).some(
-            (agent) =>
-              agent.position ||
-              agent.agreements.length > 0 ||
-              agent.disagreements.length > 0 ||
-              agent.error,
-          ) && (
+          {teamTab === "verdict" && (
+            <div className="mt-3 space-y-4">
+              <p className="text-navy/85">{displayReasoning}</p>
+
+              <dl className="grid gap-2.5 sm:grid-cols-2">
+                {[
+                  ["Best to grow", formatCropText(recommendation.agent_report.verdict.best_crop_to_grow)],
+                  ["Best to sell", formatCropText(recommendation.agent_report.verdict.best_crop_to_sell)],
+                  ["Suggested rotation", suggestedRotationValue],
+                  ["Best overall", formatCropText(recommendation.agent_report.verdict.best_overall_crop)],
+                ].map(
+                  ([label, value]) =>
+                    value && (
+                      <div key={label} className="rounded-xl bg-white/90 p-3 shadow-xs">
+                        <dt className="text-xs font-bold uppercase tracking-wider text-navy/60">{label}</dt>
+                        <dd className="mt-0.5 font-bold text-navy">{value}</dd>
+                      </div>
+                    ),
+                )}
+              </dl>
+
+              {recommendation.agent_report.verdict.things_to_consider.length > 0 && (
+                <div className="rounded-xl border border-straw/80 bg-white/80 p-3.5">
+                  <h3 className="font-bold text-sm text-navy">Things to check before planting</h3>
+                  <ul className="mt-1.5 list-disc space-y-1 pl-5 text-sm text-navy/80">
+                    {recommendation.agent_report.verdict.things_to_consider.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {recommendation.agent_report.verdict.gaps.length > 0 && (
+                <div className="mt-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-navy/60">Missing information</h3>
+                  <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-navy/70">
+                    {recommendation.agent_report.verdict.gaps.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          {teamTab === "specialists" && (
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              {(
+                [
+                  ["Climate Specialist", recommendation.agent_report.climate],
+                  ["Soil & Rotation Specialist", recommendation.agent_report.soil],
+                  ["Market Specialist", recommendation.agent_report.market],
+                ] as const
+              ).map(([name, agent]) => (
+                <article key={name} className="flex flex-col rounded-xl border border-navy/10 bg-white/90 p-4 shadow-xs">
+                  <h3 className="font-bold text-navy">{name}</h3>
+                  {agent.status === "unavailable" ? (
+                    <p className="mt-2 text-sm text-low">{agent.error}</p>
+                  ) : (
+                    <>
+                      {agent.score !== null && (
+                        <p className="mt-1 text-sm font-semibold text-fern">Score: {agent.score} / 100</p>
+                      )}
+                      {agent.recommendation && (
+                        <p className="mt-2 text-sm font-medium text-navy">{agent.recommendation}</p>
+                      )}
+                      {agent.reasons.length > 0 && (
+                        <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-navy/75">
+                          {agent.reasons.map((reason) => (
+                            <li key={reason}>{reason}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+
+          {teamTab === "debate" && (
             <div className="mt-4 rounded-xl border border-navy/10 bg-white/80 p-4">
               <h3 className="font-bold text-navy text-sm uppercase tracking-wide">Multi-Agent Discussion</h3>
               <ul className="mt-2 space-y-2 text-sm">

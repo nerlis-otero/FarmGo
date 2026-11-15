@@ -105,7 +105,7 @@ export default function BluebyChatWidget() {
             <div className="flex items-center gap-2.5">
               <div className="relative h-9 w-9 overflow-hidden rounded-xl border border-fern/40 bg-white p-0.5 shadow-xs">
                 <Image
-                  src="/iconblueby.png"
+                  src="/carita.png"
                   alt="Blueby mascot"
                   width={34}
                   height={34}
@@ -143,7 +143,7 @@ export default function BluebyChatWidget() {
                 {msg.role === "assistant" && (
                   <div className="mt-1 h-7 w-7 shrink-0 overflow-hidden rounded-lg border border-fern/30 bg-white p-0.5">
                     <Image
-                      src="/iconblueby.png"
+                      src="/carita.png"
                       alt=""
                       width={24}
                       height={24}
@@ -168,7 +168,7 @@ export default function BluebyChatWidget() {
               <div className="flex items-center gap-2 text-navy/60">
                 <div className="h-7 w-7 shrink-0 overflow-hidden rounded-lg border border-fern/30 bg-white p-0.5">
                   <Image
-                    src="/iconblueby.png"
+                    src="/carita.png"
                     alt=""
                     width={24}
                     height={24}
@@ -251,7 +251,7 @@ export default function BluebyChatWidget() {
       >
         <div className="relative h-9 w-9 overflow-hidden rounded-full border border-white/40 bg-white p-0.5 shadow-xs">
           <Image
-            src="/iconblueby.png"
+            src="/carita.png"
             alt="Blueby avatar"
             width={34}
             height={34}
