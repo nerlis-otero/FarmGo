@@ -20,7 +20,8 @@ def discuss(climate: dict, soil: dict, market: dict, priority: str) -> str:
             {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
         ],
     )
-    return resp.choices[0].message.content"""Round 2: each agent reads the other agents' round-1 analyses and responds."""
+    return resp.choices[0].message.content
+"""Round 2: each agent reads the other agents' round-1 analyses and responds."""
 import asyncio
 import json
 from shared.config import MODEL_FAST, MODEL_SOIL

@@ -4,7 +4,8 @@ import asyncio
 from agents.climate import agent as climate_agent
 from agents.market import agent as market_agent
 from agents.soil import agent as soil_agent
-from orchestrator.engine import recommend
+from orchestrator.discussion import discuss
+from orchestrator.judge import judge
 
 
 async def run_pipeline(lat: float, lon: float, priority: str) -> dict:
@@ -26,10 +27,3 @@ async def run_pipeline(lat: float, lon: float, priority: str) -> dict:
     verdict = await asyncio.to_thread(judge, analyses, discussion, priority)
 
     return {"analyses": analyses, "discussion": discussion, "verdict": verdict}
-    final = recommend(climate, soil, market, priority)
-    try:
-        discussion = await asyncio.to_thread(discuss, climate, soil, market, priority)
-    except Exception:
-        discussion = None  # si falla la discusión, la recomendación igual sale
-    return {"climate": climate, "soil": soil, "market": market, "final": final, "discussion": discussion}
-
