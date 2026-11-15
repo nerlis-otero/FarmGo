@@ -18,17 +18,19 @@ export default function RotationCard({ rotation, isBest, href }: Props) {
       <div className="flex flex-wrap gap-2">
         {isBest && (
           <p className="w-fit rounded-full bg-fern px-3 py-1 text-sm font-bold text-white">
-            Top sample for your goal
+            Top score for your goal
           </p>
         )}
         {rotation.is_current && (
           <p className="w-fit rounded-full bg-mist px-3 py-1 text-sm font-bold">
-            Example current plan
+            Example current rotation
           </p>
         )}
       </div>
 
-      <h3 className="text-xl font-bold leading-snug">{rotationName(rotation.sequence)}</h3>
+      <h3 className="text-xl font-bold leading-snug">
+        {rotation.sequence.length > 0 ? rotationName(rotation.sequence) : rotation.label}
+      </h3>
 
       <div>
         <p className="flex items-center gap-2 font-bold">

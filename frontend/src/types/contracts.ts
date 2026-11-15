@@ -1,29 +1,51 @@
 /**
- * FarmFuture AI: contratos de datos (espejo de backend/app/contracts.py).
- * Si cambias algo aquí, avisa al integrante 1 y actualiza también el backend y docs/contracts.md.
+ * FarmFuture AI data contracts (mirrored from backend/app/contracts.py).
+ * Keep the backend contract and docs/contracts.md in sync when changing these types.
  */
 
 export type CropId =
   | "corn" | "cotton" | "sorghum" | "soybean"
   | "wheat" | "peanut" | "oats_cover" | "forage_grass";
 
+export const CROP_IDS: CropId[] = [
+  "corn",
+  "cotton",
+  "sorghum",
+  "soybean",
+  "wheat",
+  "peanut",
+  "oats_cover",
+  "forage_grass",
+];
+
 export type Priority = "Profit" | "Water Saving" | "Soil Health" | "Balanced";
 
 export const PRIORITIES: Priority[] = ["Profit", "Water Saving", "Soil Health", "Balanced"];
 
-/** POST /recommend: se envía farm_id O (lat y lon). */
+export const PRIORITY_WEIGHTS: Record<
+  Priority,
+  { climate: number; soil: number; market: number }
+> = {
+  Profit: { climate: 0.25, soil: 0.15, market: 0.6 },
+  "Water Saving": { climate: 0.55, soil: 0.3, market: 0.15 },
+  "Soil Health": { climate: 0.2, soil: 0.6, market: 0.2 },
+  Balanced: { climate: 0.35, soil: 0.35, market: 0.3 },
+};
+
+/** POST /recommend accepts either farm_id or a latitude/longitude pair. */
 export interface RecommendRequest {
   farm_id?: string;
   lat?: number;
   lon?: number;
   priority: Priority;
+  current_crops?: CropId[];
 }
 
 export interface DimensionScores {
   climate: number; // 0-100
   soil: number;    // 0-100
   market: number;  // 0-100
-  total: number;   // suma ponderada según la prioridad
+  total: number;   // Weighted sum for the selected priority
 }
 
 export interface RotationResult {

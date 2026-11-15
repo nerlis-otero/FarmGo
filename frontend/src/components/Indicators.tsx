@@ -41,7 +41,7 @@ export default function Indicators({ scores }: { scores: Rotation["scores"] }) {
       <Indicator
         emoji="🌱"
         label="Soil health"
-        meaning="How the rotation can protect and support the soil."
+        meaning="How this rotation may protect and support the soil."
         score={scores.soil}
       />
       <Indicator

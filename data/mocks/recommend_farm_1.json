@@ -5,44 +5,45 @@
   "rotations": [
     {
       "id": "current",
-      "label": "Rotación actual (detectada con CropScape)",
+      "label": "Example current rotation (from CropScape)",
       "sequence": ["cotton", "cotton", "cotton"],
       "is_current": true,
       "scores": { "climate": 62, "soil": 48, "market": 80, "total": 60.5 },
-      "why": "Mantiene un cultivo de alta demanda de agua y no incluye cobertura entre ciclos.",
-      "evidence": ["Meses secos por año: 5", "NDVI bajo en otoño (campo desnudo)"],
-      "benefits": ["Ingreso conocido para el agricultor"],
-      "gaps": ["No se conoce el sistema de riego"],
-      "risks": ["Revisar con la extensión agrícola local"]
+      "why": "Keeps a crop with high water needs and does not include ground cover between growing seasons.",
+      "evidence": ["Dry months per year: 5", "Low fall NDVI (bare field)"],
+      "benefits": ["Familiar income source for the farmer"],
+      "gaps": ["The farm's irrigation system is unknown"],
+      "risks": ["Check this plan with a local agricultural extension specialist"]
     },
     {
       "id": "rot_01",
-      "label": "Rotación sugerida A",
+      "label": "Suggested rotation A",
       "sequence": ["sorghum", "soybean", "oats_cover"],
       "is_current": false,
       "scores": { "climate": 88, "soil": 85, "market": 70, "total": 84.4 },
-      "why": "Tolera la sequía, incluye una leguminosa que fija nitrógeno y cubre el suelo en la temporada desnuda.",
-      "evidence": ["Humedad del suelo modelada baja en verano", "Pendiente con riesgo de erosión"],
-      "benefits": ["Menor uso de agua", "Más materia orgánica"],
-      "gaps": ["Precio local de soybean por condado no disponible"],
-      "risks": ["Validar fechas de siembra con un experto local"]
+      "why": "Includes drought-tolerant sorghum, a nitrogen-fixing legume, and a cover crop for bare soil between growing seasons.",
+      "evidence": ["Modeled soil moisture is low in summer", "The slope may have erosion risk"],
+      "benefits": ["May use less water", "May add organic matter"],
+      "gaps": ["County-level soybean prices are not available"],
+      "risks": ["Check planting dates with a local specialist"]
     },
     {
       "id": "rot_02",
-      "label": "Rotación sugerida B",
+      "label": "Suggested rotation B",
       "sequence": ["wheat", "peanut", "forage_grass"],
       "is_current": false,
       "scores": { "climate": 80, "soil": 78, "market": 75, "total": 78.7 },
-      "why": "Equilibra ingreso y salud del suelo, con forraje como ingreso adicional.",
-      "evidence": ["Rendimientos históricos de USDA NASS"],
-      "benefits": ["Forraje como ingreso adicional"],
-      "gaps": ["Costos de producción no incluidos"],
-      "risks": ["Verificar disponibilidad de equipo"]
+      "why": "Balances income potential and soil health, with forage as a possible additional source of income.",
+      "evidence": ["Historical yields from USDA NASS"],
+      "benefits": ["Forage may provide additional income"],
+      "gaps": ["Production costs are not included"],
+      "risks": ["Check that the required equipment is available"]
     }
   ],
   "data_notes": [
-    "La humedad del suelo de NASA POWER es modelada, no observada por satélite.",
-    "Los valores de este archivo son datos de prueba (mock)."
+    "NASA POWER soil moisture is modeled, not directly observed by satellite.",
+    "Values in this file are test data, not measurements from a specific farm.",
+    "Live climate, soil, satellite, and local market data are not connected yet."
   ],
-  "disclaimer": "Esta herramienta apoya la decisión del agricultor; no reemplaza el criterio de un experto agrícola local."
+  "disclaimer": "This tool supports farm decisions; it does not replace advice from a local agricultural expert."
 }
