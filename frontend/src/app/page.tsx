@@ -37,7 +37,7 @@ export default function Home() {
         ? outsideTexas
           ? "Marked. This preview is built for Texas."
           : "Farm marked. Next: your crops."
-        : "Mark your farm on the map to begin.";
+        : "Hi, I’m Blueby! Mark your farm on the map to get started.";
 
   function useMyLocation() {
     if (!navigator.geolocation) {

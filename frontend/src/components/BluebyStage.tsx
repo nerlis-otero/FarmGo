@@ -42,6 +42,9 @@ export default function BluebyStage({ text, children, compact = false }: Props) 
           <Blueby talking={!done} />
         </div>
         <div className="bubble min-w-0 flex-1 rounded-xl border-2 border-navy/80 bg-white/95 p-3 shadow-sm sm:p-4">
+          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-fern">
+            Blueby
+          </p>
           <p className="sr-only" role="status">
             Blueby says: {text}
           </p>
