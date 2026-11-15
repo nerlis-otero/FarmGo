@@ -1,42 +1,41 @@
-"""Climate Agent: prompt + bucle de tool calling. Sin lógica HTTP."""
+"""Climate Agent: code fetches the data, the model analyzes it (no tool calling)."""
 import json
 
 from agents.climate.schema import ClimateOutput
-from agents.climate.tools import TOOLS, get_nasa_power
+from agents.climate.tools import get_nasa_power
 from shared.config import MODEL_FAST
 from shared.groq_client import get_client
 from shared.json_utils import parse_llm_json
 
-SYSTEM_PROMPT = """Eres el Climate Agent de una app para agricultores de Texas.
-Usa SOLO los datos devueltos por la herramienta get_nasa_power; no inventes cifras.
-Si falta un dato, dilo en reasons. Responde SOLO con un JSON con las claves:
-candidateCrops (lista de cultivos viables), climateScore (entero 0-100), reasons (lista de textos cortos)."""
+SYSTEM_PROMPT = """You are the Climate Agent of a farm advisory app.
+Use ONLY the data provided in the message; do not invent numbers.
+The data comes from NASA POWER: monthly means of temperature, rainfall, relative humidity,
+solar radiation and root-zone soil moisture over the last three years.
+If the data has an error or is missing values, say so in reasons instead of guessing.
+Write reasons in plain English, short sentences a farmer can understand.Each reason must cite at least one specific value or range
+ from the data (for example the rainfall in mm/day or the temperature range in °C).
+Respond ONLY with JSON with keys:
+candidateCrops (list of viable crops), climateScore (integer 0-100), reasons (list of short strings)."""
+
+
+def _safe(fn, *args) -> dict:
+    """Si la fuente falla, el agente lo reporta en vez de caerse."""
+    try:
+        return fn(*args)
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def run(lat: float, lon: float, priority: str) -> dict:
-    client = get_client()
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": f"Parcela en lat {lat}, lon {lon}. Prioridad del agricultor: {priority}."},
-    ]
-    for _ in range(5):  # tope de vueltas para evitar bucles
-        resp = client.chat.completions.create(
-            model=MODEL_FAST, messages=messages, tools=TOOLS, tool_choice="auto"
-        )
-        msg = resp.choices[0].message
-        if not msg.tool_calls:
-            data = parse_llm_json(msg.content)
-            return ClimateOutput(**data).model_dump()
-        messages.append(msg)
-        for call in msg.tool_calls:
-            try:
-                # Usamos las coordenadas reales, no las que invente el modelo
-                result = get_nasa_power(lat, lon)
-            except Exception as e:
-                result = {"error": str(e)}
-            messages.append({
-                "role": "tool",
-                "tool_call_id": call.id,
-                "content": json.dumps(result),
-            })
-    raise RuntimeError("Climate Agent no terminó en el número máximo de vueltas")
+    data = {"nasa_power": _safe(get_nasa_power, lat, lon)}
+    resp = get_client().chat.completions.create(
+        model=MODEL_FAST,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": (
+                f"Farm location: lat {lat}, lon {lon}. Farmer priority: {priority}.\n"
+                f"Data:\n{json.dumps(data)}"
+            )},
+        ],
+    )
+    return ClimateOutput(**parse_llm_json(resp.choices[0].message.content)).model_dump()

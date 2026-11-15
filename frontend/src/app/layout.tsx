@@ -6,8 +6,8 @@ import { body } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FarmFuture AI | Crop planning preview",
-  description: "Explore clear, sample crop rotation plans for Texas farms.",
+  title: "FarmFuture AI | Crop planning",
+  description: "Compare crop rotation plans for Texas farms.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span>FarmFuture AI</span>
             </Link>
             <p className="hidden text-sm font-medium text-navy/65 sm:block">
-              A simple crop planning preview for Texas farms
+              A simple crop planning guide for Texas farms
             </p>
           </div>
         </header>
