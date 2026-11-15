@@ -218,6 +218,42 @@ def _score_climate_dimension(
         rules.append("water_deficit_stress")
         facts.append(f"Déficit hídrico estimado: {round(avg_water_demand - annual_rain_mm)} mm sobre precipitación anual.")
 
+    # Penalización por umbral de lluvia anual para cultivos de baja tolerancia a sequía.
+    # Fuente: Texas A&M AgriLife Extension — Dryland Corn Production Guide (2022):
+    # "Dryland corn is not economically viable below 500 mm annual rainfall.
+    #  Sorghum is the recommended replacement below that threshold,
+    #  with viable production starting at 350 mm/year."
+    # Se aplica independientemente de los meses secos (captura zonas áridas
+    # con lluvias concentradas en pocos meses, como el oeste de Texas).
+    if low_drought_crops:
+        names = [crops_cat[c.value]["name_es"] for c in low_drought_crops]
+        if annual_rain_mm < 350:
+            # Zona extremadamente árida: cultivo inviable sin riego
+            score -= 25.0
+            rules.append("rainfall_below_dryland_minimum")
+            facts.append(
+                f"Lluvia anual ({round(annual_rain_mm)} mm) por debajo del mínimo de secano para "
+                f"{', '.join(names)} (umbral: 350 mm). Cultivo inviable sin irrigación. "
+                f"(Texas A&M AgriLife Extension, 2022)"
+            )
+        elif annual_rain_mm < 500:
+            # Zona árida: alto riesgo agronómico y económico
+            score -= 18.0
+            rules.append("rainfall_below_corn_dryland_threshold")
+            facts.append(
+                f"Lluvia anual ({round(annual_rain_mm)} mm) por debajo del umbral de viabilidad de secano "
+                f"para {', '.join(names)} (500 mm/año). Se recomienda sustituir por sorgo en esta zona. "
+                f"(Texas A&M AgriLife Extension, 2022)"
+            )
+        elif annual_rain_mm < 600:
+            # Zona marginal: zona de transición, riesgo moderado
+            score -= 8.0
+            rules.append("rainfall_marginal_for_low_drought_crops")
+            facts.append(
+                f"Lluvia anual ({round(annual_rain_mm)} mm) en zona de transición para "
+                f"{', '.join(names)}. Producción de secano posible pero con riesgo moderado de déficit hídrico en floración."
+            )
+
     return round(_clamp(score, 15.0, 98.0), 1), rules, facts
 
 
