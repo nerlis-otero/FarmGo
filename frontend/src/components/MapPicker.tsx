@@ -39,10 +39,13 @@ export default function MapPicker({
   const circleRef = useRef<Circle | null>(null);
   const leafletRef = useRef<typeof import("leaflet") | null>(null);
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
 
   const [status, setStatus] = useState<string>("");
   const [locating, setLocating] = useState(false);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   // Coloca/mueve el marcador y el círculo de precisión
   const placeMarker = useCallback((c: Coords, fly = false) => {

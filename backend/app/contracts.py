@@ -180,6 +180,42 @@ class RotationResult(BaseModel):
     risks: list[str]
 
 
+class AgentAnalysisSummary(BaseModel):
+    status: Literal["complete", "unavailable"]
+    score: Optional[float] = Field(default=None, ge=0, le=100)
+    recommendation: Optional[str] = None
+    alternatives: list[str] = Field(default_factory=list)
+    reasons: list[str] = Field(default_factory=list)
+    error: Optional[str] = None
+
+
+class AgentDiscussionSummary(BaseModel):
+    agreements: list[str] = Field(default_factory=list)
+    disagreements: list[str] = Field(default_factory=list)
+    position: Optional[str] = None
+    error: Optional[str] = None
+
+
+class FarmerVerdict(BaseModel):
+    best_crop_to_grow: Optional[str] = None
+    best_crop_to_sell: Optional[str] = None
+    recommended_rotation: Optional[str] = None
+    best_overall_crop: Optional[str] = None
+    reasoning: str
+    confidence: Literal["low", "medium", "high"]
+    things_to_consider: list[str] = Field(default_factory=list)
+    gaps: list[str] = Field(default_factory=list)
+    judge_used: bool
+
+
+class MultiAgentReport(BaseModel):
+    climate: AgentAnalysisSummary
+    soil: AgentAnalysisSummary
+    market: AgentAnalysisSummary
+    discussion: dict[str, AgentDiscussionSummary]
+    verdict: FarmerVerdict
+
+
 class RecommendResponse(BaseModel):
     farm_id: str
     priority: Priority
@@ -187,6 +223,7 @@ class RecommendResponse(BaseModel):
     rotations: list[RotationResult] = Field(min_length=3, max_length=3)
     data_notes: list[str] = Field(default_factory=list)  # ej. "Humedad del suelo modelada"
     disclaimer: str
+    agent_report: Optional[MultiAgentReport] = None
 
 
 # ---------------------------------------------------------------------------

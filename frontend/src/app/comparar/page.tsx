@@ -94,6 +94,112 @@ function Comparison() {
 
       <BluebyStage text={bluebySummary(recommendation)} />
 
+      {recommendation.agent_report && (
+        <section
+          aria-labelledby="agent-verdict-heading"
+          className="rounded-2xl border-2 border-fern/40 bg-foam p-5 shadow-soft sm:p-6"
+        >
+          <p className="text-sm font-bold uppercase tracking-[0.14em] text-fern">
+            Farm team verdict · {recommendation.agent_report.verdict.confidence} confidence
+          </p>
+          <h2 id="agent-verdict-heading" className="mt-1 text-2xl font-bold">
+            What the specialists recommend
+          </h2>
+          <p className="mt-2">{recommendation.agent_report.verdict.reasoning}</p>
+
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+            {[
+              ["Best crop to grow", recommendation.agent_report.verdict.best_crop_to_grow],
+              ["Best crop to sell", recommendation.agent_report.verdict.best_crop_to_sell],
+              ["Suggested rotation", recommendation.agent_report.verdict.recommended_rotation],
+              ["Best overall crop", recommendation.agent_report.verdict.best_overall_crop],
+            ].map(([label, value]) => value && (
+              <div key={label} className="rounded-xl bg-white/80 p-3">
+                <dt className="text-sm font-bold text-navy/70">{label}</dt>
+                <dd className="mt-1 font-bold">{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          {recommendation.agent_report.verdict.things_to_consider.length > 0 && (
+            <div className="mt-4 rounded-xl border border-straw/80 bg-white/80 p-4">
+              <h3 className="font-bold">Things to check before deciding</h3>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                {recommendation.agent_report.verdict.things_to_consider.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {recommendation.agent_report.verdict.gaps.length > 0 && (
+            <div className="mt-3">
+              <h3 className="font-bold">Missing information</h3>
+              <ul className="mt-1 list-disc space-y-1 pl-5 text-navy/80">
+                {recommendation.agent_report.verdict.gaps.map((item) => <li key={item}>{item}</li>)}
+              </ul>
+            </div>
+          )}
+
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {([
+              ["Climate", recommendation.agent_report.climate],
+              ["Soil and rotation", recommendation.agent_report.soil],
+              ["Market", recommendation.agent_report.market],
+            ] as const).map(([name, agent]) => (
+              <article key={name} className="rounded-xl border border-navy/10 bg-white/80 p-4">
+                <h3 className="font-bold">{name} specialist</h3>
+                {agent.status === "unavailable" ? (
+                  <p className="mt-2 text-low">{agent.error}</p>
+                ) : (
+                  <>
+                    {agent.score !== null && (
+                      <p className="mt-1 text-sm font-semibold">Agent score: {agent.score} / 100</p>
+                    )}
+                    {agent.recommendation && <p className="mt-2">{agent.recommendation}</p>}
+                    {agent.reasons.length > 0 && (
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-navy/80">
+                        {agent.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                      </ul>
+                    )}
+                  </>
+                )}
+              </article>
+            ))}
+          </div>
+
+          {Object.values(recommendation.agent_report.discussion).some(
+            (agent) =>
+              agent.position ||
+              agent.agreements.length > 0 ||
+              agent.disagreements.length > 0 ||
+              agent.error,
+          ) && (
+            <section className="mt-4 rounded-xl bg-white/80 p-4">
+              <h3 className="font-bold">Agent discussion</h3>
+              <ul className="mt-2 space-y-2">
+                {Object.entries(recommendation.agent_report.discussion).map(([name, agent]) => (
+                  <li key={name}>
+                    <strong className="capitalize">{name}:</strong>{" "}
+                    {agent.error ?? agent.position ?? "No discussion summary is available."}
+                    {agent.agreements.length > 0 && (
+                      <span className="block text-navy/75">
+                        Shared points: {agent.agreements.join("; ")}
+                      </span>
+                    )}
+                    {agent.disagreements.length > 0 && (
+                      <span className="block text-navy/75">
+                        Points of difference: {agent.disagreements.join("; ")}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </section>
+      )}
+
       <section className="rounded-2xl border border-fern/30 bg-white/95 p-5 shadow-soft sm:p-6">
         <p className="text-sm font-bold uppercase tracking-[0.14em] text-fern">
           {hasCrops ? "Crop to add to your rotation" : "Best crop to start with"}
@@ -189,10 +295,19 @@ function Comparison() {
       {best && (
         <section className="rounded-2xl border border-fern/20 bg-white/95 p-5 shadow-soft sm:p-6">
           <p className="mb-1 text-sm font-bold uppercase tracking-[0.14em] text-fern">
-            Why this plan scores highest
+            Recommended plan and why it fits your goal
           </p>
           <h2 className="text-2xl font-bold">{best.label}</h2>
           <p className="mt-2">{best.why}</p>
+          {recommendation.agent_report?.verdict.reasoning && (
+            <p className="mt-2">{recommendation.agent_report.verdict.reasoning}</p>
+          )}
+          {recommendation.agent_report?.verdict.recommended_rotation && (
+            <p className="mt-3 rounded-lg bg-foam p-3">
+              <strong>Specialists’ suggested rotation:</strong>{" "}
+              {recommendation.agent_report.verdict.recommended_rotation}
+            </p>
+          )}
           {best.benefits.length > 0 && (
             <ul className="mt-3 list-disc space-y-1 pl-5 text-navy/80">
               {best.benefits.map((benefit) => <li key={benefit}>{benefit}</li>)}

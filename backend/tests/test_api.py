@@ -2,13 +2,19 @@
 import sys
 import json
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "backend"))
 
 from fastapi.testclient import TestClient  # noqa: E402
 
+from app.contracts import (  # noqa: E402
+    AgentAnalysisSummary,
+    FarmerVerdict,
+    MultiAgentReport,
+    RecommendResponse,
+)
 from app.main import app  # noqa: E402
 
 client = TestClient(app)
@@ -63,16 +69,36 @@ def test_priority_changes_totals():
 
 
 def test_recommend_with_point():
-    with patch("app.main.recommend_for_location", return_value=load_mock()) as recommend_location:
-        r = client.post(
-            "/recommend",
-            json={
-                "lat": 33.5,
-                "lon": -101.8,
-                "priority": "Balanced",
-                "current_crops": ["cotton"],
-            },
-        )
+    agent_report = MultiAgentReport(
+        climate=AgentAnalysisSummary(status="complete", score=80, recommendation="Sorghum"),
+        soil=AgentAnalysisSummary(status="complete", score=75, recommendation="Sorghum → Soybean"),
+        market=AgentAnalysisSummary(status="complete", score=65, recommendation="Cotton"),
+        discussion={},
+        verdict=FarmerVerdict(
+            best_crop_to_grow="Sorghum",
+            best_crop_to_sell="Cotton",
+            recommended_rotation="Sorghum → Soybean",
+            reasoning="Sorghum fits the climate results. Check local soil conditions before planting.",
+            confidence="medium",
+            things_to_consider=["Confirm local soil conditions."],
+            gaps=[],
+            judge_used=True,
+        ),
+    )
+    with patch(
+        "app.main.recommend_for_location",
+        return_value=RecommendResponse(**load_mock()),
+    ) as recommend_location:
+        with patch("app.main.run_pipeline", new_callable=AsyncMock, return_value=agent_report):
+            r = client.post(
+                "/recommend",
+                json={
+                    "lat": 33.5,
+                    "lon": -101.8,
+                    "priority": "Balanced",
+                    "current_crops": ["cotton"],
+                },
+            )
     assert r.status_code == 200
     recommend_location.assert_called_once()
     assert recommend_location.call_args.args == (
@@ -81,6 +107,10 @@ def test_recommend_with_point():
         "Balanced",
         ["cotton"],
     )
+    assert r.json()["agent_report"]["verdict"]["best_crop_to_grow"] == "Sorghum"
+    assert r.json()["agent_report"]["verdict"]["things_to_consider"] == [
+        "Confirm local soil conditions."
+    ]
 
 
 def test_location_data_failure_returns_service_unavailable():

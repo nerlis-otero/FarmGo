@@ -29,6 +29,7 @@ from app.contracts import (
 )
 from app.location_analysis import recommend_for_location
 from app.services.market_service import get_market_metrics
+from orchestrator.pipeline import run_pipeline
 
 ROOT = Path(__file__).resolve().parents[2]  # raiz del repo
 MOCK_PATH = ROOT / "data" / "mocks" / "recommend_farm_1.json"
@@ -66,15 +67,17 @@ def farms() -> list[dict]:
 
 
 @app.post("/recommend", response_model=RecommendResponse, responses={404: {"description": "Finca desconocida"}})
-def recommend(req: RecommendRequest) -> RecommendResponse:
+async def recommend(req: RecommendRequest) -> RecommendResponse:
     if req.lat is not None and req.lon is not None:
         try:
-            return recommend_for_location(
+            response = recommend_for_location(
                 req.lat,
                 req.lon,
                 req.priority,
                 req.current_crops,
             )
+            response.agent_report = await run_pipeline(req.lat, req.lon, req.priority.value)
+            return response
         except (RequestException, OSError, ValueError) as error:
             logger.warning(
                 "Could not build a recommendation for coordinates %.4f, %.4f: %s",
