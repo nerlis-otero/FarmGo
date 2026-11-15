@@ -38,10 +38,10 @@ FARMS_PATH = ROOT / "data" / "farms.json"
 app = FastAPI(title="FarmGo", version="0.1.0")
 logger = logging.getLogger(__name__)
 
-# Permite que el frontend (Next.js en el puerto 3000) llame al API.
+# Permite que el frontend (Next.js local o en Vercel) llame al API sin bloqueos de CORS.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
