@@ -20,7 +20,8 @@ def _fetch_power(lat: float, lon: float, start: str, end: str) -> dict:
         "start": start, "end": end, "format": "JSON",
     }
     r = requests.get(POWER_URL, params=params, timeout=60)
-    if not r.ok:
+    ok = r.ok if hasattr(r, "ok") else r.is_success
+    if not ok:
         raise RuntimeError(f"NASA POWER {r.status_code}: {r.text[:500]}")
     return r.json()["properties"]["parameter"]
 
