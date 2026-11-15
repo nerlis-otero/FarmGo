@@ -15,7 +15,7 @@ Si necesitas cambiar un formato: avisa al integrante 1 y actualiza **los tres ar
 ## Identificadores fijos
 
 - **Cultivos (`CropId`):** `corn`, `cotton`, `sorghum`, `soybean`, `wheat`, `peanut`, `oats_cover`, `forage_grass`
-- **Prioridades (`Priority`):** `Profit`, `Water Saving`, `Soil Health`, `Balanced`
+- **Prioridades (`Priority`):** `profit`, `water_saving`, `soil_health`, `balanced`
 - **Fincas de ejemplo:** `farm_1`, `farm_2`, `farm_3` (ver `data/farms.json`)
 - **Llave de clima:** `county_fips` (5 dígitos). **Suelo y cultivos:** por punto (lat/lon).
 - **Petición:** `farm_id` o un par de coordenadas válidas `lat`/`lon`, `priority` y, de forma opcional,
@@ -80,6 +80,48 @@ El prompt vive en `prompts/` y exige:
 
 Si la respuesta no valida contra `LLMOutput`, el backend reintenta una vez; si vuelve a fallar, devuelve la
 rotación con `why` genérico y `gaps: ["Explicación no disponible"]`.
+
+## Chatbot (`POST /chat`)
+
+Asistente conversacional limitado a temas de cultivos (clima, suelo, rotación y precios) en Texas.
+Usa GPT-OSS 20B como filtro de alcance y GPT-OSS 120B con herramientas para responder.
+
+**Petición**
+```json
+{
+  "message": "Is sorghum a good option with little rain?",
+  "history": [
+    { "role": "user", "content": "..." },
+    { "role": "assistant", "content": "..." }
+  ],
+  "lat": 31.5,
+  "lon": -100.4,
+  "priority": "water_saving",
+  "last_verdict": {}
+}
+```
+
+| Campo | Obligatorio | Notas |
+|---|---|---|
+| `message` | sí | Mensaje actual del usuario |
+| `history` | no | Mensajes previos, SIN incluir el actual. El backend usa los últimos 8 |
+| `lat`, `lon` | no | Ubicación de la finca |
+| `priority` | no | Mismos valores que `/recommend` (ver "Identificadores fijos") |
+| `last_verdict` | no | Último `RecommendResponse` (o su `agent_report`) para que el chat pueda explicarlo |
+
+**Respuesta**
+```json
+{ "reply": "texto para mostrar en el chat", "in_scope": true }
+```
+
+Si `in_scope` es `false`, `reply` ya trae el texto de rechazo y se muestra como cualquier otro mensaje.
+
+**Reglas del chat**
+- Solo responde sobre cultivos; lo demás se rechaza.
+- Usa únicamente datos de las herramientas o del contexto enviado; no inventa cifras y reporta lo que falte.
+- No recalcula puntajes: los números los calcula el motor de puntuación, el chat solo los explica.
+- Recuerda que la decisión final es del agricultor.
+
 
 ## Ejemplos
 
