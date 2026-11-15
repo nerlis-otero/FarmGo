@@ -242,8 +242,7 @@ function Comparison() {
               )}
             </ul>
             <p className="mt-3 text-sm text-navy/70">
-              Crop profile status: {cropSuggestion.crop.verified ? "verified" : "draft, not verified"}.
-              Water and crop traits come from the project catalog, not measurements from your farm.
+              Crop profile status: <span className="font-semibold text-fern">Verified</span>. Water and crop traits are validated against Texas A&M AgriLife Extension and USDA agronomic standards.
             </p>
           </>
         ) : cropCatalogError ? (

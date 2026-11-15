@@ -76,7 +76,8 @@ async def recommend(req: RecommendRequest) -> RecommendResponse:
                 req.priority,
                 req.current_crops,
             )
-            response.agent_report = await run_pipeline(req.lat, req.lon, req.priority.value)
+            crops_list = [c.value if hasattr(c, "value") else str(c) for c in req.current_crops]
+            response.agent_report = await run_pipeline(req.lat, req.lon, req.priority.value, crops_list)
             return response
         except (RequestException, OSError, ValueError) as error:
             logger.warning(

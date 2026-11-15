@@ -16,18 +16,17 @@ PRICE_FILE = DATASETS_DIR / "nass_precio_texas_limpio.csv"
 YIELD_FILE = DATASETS_DIR / "nass_rendimiento_texas_limpio.csv"
 
 GENERAL_GAPS = [
-    "Los precios y rendimientos son promedios de todo Texas, no de tu condado.",
-    "No incluye costos de producción: el ingreso por acre es bruto, no es ganancia.",
-    "Los datos van de 2020 a 2025; el 2026 no se usa porque no ha terminado.",
+    "Prices and yields are Texas state averages, not specific to your county.",
+    "Does not include production costs: gross revenue per acre is not net profit.",
+    "Data covers 2020 to 2025; current crop year is omitted as it is incomplete.",
 ]
 
-LAST_YEAR = 2025  # último año completo usado
+LAST_YEAR = 2025  # most recent complete crop year
 
-# Avisos propios de cada cultivo (se agregan a "gaps" solo cuando el cultivo se consulta).
+# Crop-specific cautions
 CROP_NOTES = {
     "oats_cover": (
-        "oats_cover: precio y rendimiento son de avena para grano; no representan su uso "
-        "como cultivo de cobertura, que no genera ese ingreso."
+        "oats_cover: price and yield reflect grain oats; usage as a cover crop (cobertura) does not generate this cash revenue."
     ),
 }
 
@@ -36,7 +35,7 @@ def _crop_gaps(crop: str, last_price_year: int) -> list[str]:
     notes = []
     if last_price_year < LAST_YEAR:
         notes.append(
-            f"{crop}: NASS no publicó el precio de {LAST_YEAR}; se usa el de {last_price_year}."
+            f"{crop}: USDA NASS has not published the {LAST_YEAR} price; using {last_price_year} as the latest available."
         )
     if crop in CROP_NOTES:
         notes.append(CROP_NOTES[crop])
@@ -83,8 +82,8 @@ def get_market_metrics(crop_ids: list[CropId]) -> MarketMetrics:
             y = yields[yields["crop_id"] == crop.value].sort_values("year")
 
             if p.empty or y.empty:
-                crops[crop] = CropMarket()  # todo en None: no inventamos datos
-                gaps.append(f"No hay datos de mercado para {crop.value}.")
+                crops[crop] = CropMarket()  # All None: don't invent data
+                gaps.append(f"No market data available for {crop.value}.")
                 continue
 
             latest_price = float(p["price_value"].iloc[-1])
@@ -117,7 +116,7 @@ def get_market_metrics(crop_ids: list[CropId]) -> MarketMetrics:
 
             if not p_rows or not y_rows:
                 crops[crop] = CropMarket()
-                gaps.append(f"No hay datos de mercado para {crop.value}.")
+                gaps.append(f"No market data available for {crop.value}.")
                 continue
 
             latest_price = float(p_rows[-1]["price_value"])

@@ -97,14 +97,17 @@ def _fallback_verdict(analyses: dict) -> FarmerVerdict:
     )
 
 
-async def run_pipeline(lat: float, lon: float, priority: str) -> MultiAgentReport:
+async def run_pipeline(
+    lat: float, lon: float, priority: str, current_crops: list[str] | None = None
+) -> MultiAgentReport:
     # Round coordinates to protect the farmer's location privacy.
     lat, lon = round(lat, 2), round(lon, 2)
     priority_key = _priority_key(priority)
+    current_crops = current_crops or []
 
     results = await asyncio.gather(
         asyncio.to_thread(climate_agent.run, lat, lon, priority_key),
-        asyncio.to_thread(soil_agent.run, lat, lon, priority_key),
+        asyncio.to_thread(soil_agent.run, lat, lon, priority_key, current_crops),
         asyncio.to_thread(market_agent.run, lat, lon, priority_key),
         return_exceptions=True,
     )
